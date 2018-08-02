@@ -1,0 +1,129 @@
+Spotmania
+App ID: 58657993420
+App Secret:	3b60010c06d382de6f80ecb343e36c95(reset)
+
+advertisers
+rockyou - rejected
+lifestreet - currently using but very few ads
+http://appssavvy.com/ -interstitial gd?
+http://www.directcpv.com/ - not approved by fb?
+
+
+
+http://developers.facebook.com/docs/guides/games/getting-started/  
+
+  https://graph.facebook.com/58657993420/accounts/test-users?installed=true&name=testuser2&locale=en_US&permissions=email,user_birthday,status_update,publish_stream,publish_actions,friends_games_activity&method=post&access_token=58657993420|SVC_1y7kP4J88gOihqM9BcJDbhc  
+
+   "id": "100003745277367",
+   "access_token": "AAAAADahJ8swBAKp4fl0p34yBqXSTm9tTVFyL8kohy9cJuPnos2VRG755jP2buFIZB5RKlyqXIfP3uo6prrZBoa09DzNxt6VGdFGTRF7tYFmqp4tAnJ",
+   "login_url": "https://www.facebook.com/platform/test_account_login.php?user_id=100003745277367&n=xznDqoVtPIIEJQ6",
+   "email": "testuser_ztpajxx_testuser\u0040tfbnw.net",
+   "password": "1445731391"   
+
+{"data":
+[
+	{"user":{"name":"Play Chap","id":"1669294166"},"score":1290,"application":{"name":"Spotmania","namespace":"spotmania","id":"58657993420"}},
+	{"user":{"name":"Zhi Heng","id":"752378646"},"score":0,"application":{"name":"Spotmania","namespace":"spotmania","id":"58657993420"}},
+	{"user":{"name":"Calvin Chia","id":"614230408"},"score":0,"application":{"name":"Spotmania","namespace":"spotmania","id":"58657993420"}},
+	{"user":{"name":"Calvin Chia","id":"709494213"},"score":0,"application":{"name":"Spotmania","namespace":"spotmania","id":"58657993420"}}
+]
+}
+
+data.data[0]['user']['id']
+data.data[0]['socre']
+
+
+
+todo:
+
+play from actual siteusing fb connect 
+
+populate spotmania page with content
+screen-shots, game rules, future expansions...etc in fb page for spotmania
+
+paypal donate?? allowed?
+
+use fb credit to buy more clues? eg start with +1 clues?
+
+change ad remove icon to star icon001
+
+load as much as possible on page load without calling ajax - hiscore and check for continue
+
+if sync was done - to initiate a hiscore refresh
+
+share button
+
+ask lifestreet abt xd javascript error
+
+like box height too little - mac firefox
+
+scores in hiscore get cut off - mac firefox
+
+like the page to start with more clues?
+
+more ads for interstitial?
+
+use credits to unlock packages
+
+Achievements
+
+Invites management?
+
+give more clues for more invites? 
+eg: 200 invited to get 1 extra clue, 50 invited who join to get 1 extra clue
+
+when check gets error?
+
+boss battles
+
+test environment
+
+encypt Ajax calls
+
+google analytics plus button events tracking
+
+add cron backup of mysql db - weekly?
+
+add wall postings bagging stories for wall posts
+
+make mobile version
+
+fb credit offers
+
+*safari ajax cannot get fb user data
+pass signed request using ajax
+http://markuzweb.blogspot.com/2012/04/facebook-iframe-app-in-safari.html
+
+*like the game to start with more clues?
+https://graph.facebook.com/me/likes/124612367640366
+
+*like box
+
+*ranking:
+SELECT  uo.fid, user.name, uo.highscore,
+        (
+        SELECT  COUNT(*)
+        FROM    gamedata ui
+        WHERE   (ui.highscore, ui.fid) >= (uo.highscore, uo.fid)
+        ) AS rank
+FROM    gamedata uo
+LEFT JOIN user ON uo.fid=user.fid
+WHERE   uo.fid = 100003739307065
+
+*check for new user permissions:
+email? publish score? get scores?
+
+*add browser type into game history
+
+*continue from save state
+
+*Hiscore ranking including hiscore
+
+*Refresh hiscore after game finishes
+
+*bugs:
+photos in history table wrong
+birthdate not captured in user table
+datestamps are wrong
+
+*use fb credit to remove ads
