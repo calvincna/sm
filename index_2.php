@@ -7,8 +7,8 @@
 	<meta property="og:title"         	content="Spotmania" />
 	<meta property="og:site_name" 		content="Playchap" />
 	<meta property="og:description"   	content="The unprecedented operation to save 12 boys and their football coach from a flooded cave in Thailand." />
-	<meta property="og:image" content="https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/images/spotscreen4s.jpg"/>
-	<meta property="og:url" content="https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/index.php" />
+	<meta property="og:image" content="http://playchap.com/spotmania/images/spotscreen4s.jpg"/>
+	<meta property="og:url" content="http://playchap.com/spotmania/index.php" />
 	<meta property="fb:app_id" content="58657993420" />
 	
 	
@@ -19,8 +19,8 @@
 	
 	<!--link rel="stylesheet" type="text/css" href="style.css" /-->
 	<!--link href='http://fonts.googleapis.com/css?family=Anonymous+Pro' rel='stylesheet' type='text/css'-->
-	<link href='https://fonts.googleapis.com/css?family=Gudea:700|Anonymous+Pro' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
+	<link href='http://fonts.googleapis.com/css?family=Gudea:700|Anonymous+Pro' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
 	
 	<style type="text/css">
 		body {
@@ -39,10 +39,6 @@
 			-o-user-select: none;
 			user-select: none;
 			cursor:default;
-			
-			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-			-moz-tap-highlight-color: rgba(0, 0, 0, 0);
-		
 		}
 		.clear {
 			clear:both;
@@ -83,7 +79,7 @@
 		.canvas {
 			/*width:288px;
 			height:384px;	*/	
-			width:48%;
+			width:39.5%;
 			max-width:288px;
 			/*border:3px solid black;*/
 			border:1% solid black;
@@ -93,8 +89,7 @@
 		#timeBar {
 			
 			background: transparent url('images/timebar1.png') no-repeat scroll top right;
-			/*width:588px;*/
-			width:100%;
+			width:588px;
 			height:25px;
 			position:relative;
 			top:0px;
@@ -103,8 +98,7 @@
 		
 		#timeBarGrid {
 			background: transparent url('images/timebar1grid.png') no-repeat scroll top right;
-			/*width:588px;*/
-			width:100%;
+			width:588px;
 			height:25px;
 			position:relative;
 			top:-25px;
@@ -112,8 +106,7 @@
 		
 		#timeBarBg {
 			background-color:#4C4646;
-			/*width:588px;*/
-			width:100%;
+			width:588px;
 			height:25px;
 			position:absolute;
 			top:0px;
@@ -123,8 +116,7 @@
 		
 		#timeBarDiv {
 			margin-top:10px;
-			/*width:588px;*/
-			width:80%;
+			width:588px;
 			height:25px;
 			border:2px solid black;
 			position:relative;
@@ -676,7 +668,7 @@
 	</div>
 
 	<div id="hiscore" style="display:none">
-	<div id="playerImage"></div>
+	<div id="playerImage"><img src='http://graph.facebook.com/<?php echo $id ?>/picture'/></div>
 	<div id="playerName"><?php echo $user_profile[name]; ?></div>
 	<div id="playerHiscoreDiv">High score: <span id="playerHiscore">0</span></div>
 	<div class="clear"></div>
@@ -754,12 +746,8 @@
 			var intervalTime = 300;
 			var progressIntervalId = 0;
 			
-			//var progressMax=588;
-			var progressMax= $("#timeBarBg").width();
+			var progressMax=588;
 			var progress=progressMax;
-			
-			var progressInt = Math.round(progressMax/intervalTime);
-			console.log(progressInt);
 			
 			var easyTotal = 65;
 			var hardTotal = 200;
@@ -1053,21 +1041,21 @@
 
 			function startGame() {
 			
-				while(lowEnd <= hardTotal){
-				   arrHard.push(lowEnd++);
-				}
+			while(lowEnd <= hardTotal){
+			   arrHard.push(lowEnd++);
+			}
 			
-				var lowEnd2 = 1;
+			var lowEnd2 = 1;
 			
-				while(lowEnd2 <= easyTotal){
-				   arrEasy.push(lowEnd2++);
-				}
+			while(lowEnd2 <= easyTotal){
+			   arrEasy.push(lowEnd2++);
+			}
 			
-				arrEasy = shuffle(arrEasy);
-				arrHard = shuffle(arrHard);
+			arrEasy = shuffle(arrEasy);
+			arrHard = shuffle(arrHard);
 			
-				arrGames["easy"] = arrEasy;
-				arrGames["hard"] = arrHard;
+			arrGames["easy"] = arrEasy;
+			arrGames["hard"] = arrHard;
 			
 				imgLoaded[0] = 0;	
 				imgLoaded[1] = 0;	
@@ -1075,7 +1063,7 @@
 				//pad(123, 4);
 				
 				//var gameType = "easy";
-				//var gamePointer = 1; 
+			//var gamePointer = 1; 
 				
 				//var encoded = encodeURI("type=" + "startGame" + "&end="+ "7");
 				//arrGames["easy"]
@@ -1088,7 +1076,7 @@
 			
 				$.ajax({
 					type: "POST",
-					url: "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/getspots2.php",
+					url: "http://playchap.com/spotmania/getspots2.php",
 					data: encoded,
 					dataType: 'json'
 				}).done(function(data) {
@@ -1105,11 +1093,11 @@
 					//$("#clues").html(gameClues);					
 					
 					if ( $.browser.msie ) {						
-						img1.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][0];
-						img2.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][1];						
+						img1.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][0];
+						img2.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][1];						
 					} else {
-						img1.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][0];
-						img2.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][1];
+						img1.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][0];
+						img2.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][1];
 					}						
 					
 					
@@ -1144,16 +1132,7 @@
 		
 			function timerProgress()
 			{
-				//progress--;
-				
-				//console.log(progressInt);
-				//console.log(progress);
-				//console.log(Number(progess) - Number(progressInt));
-				//progess = progess - progressInt;
-				
-				//console.log($("#timeBarBg").width() - progressInt);
-				progress = $("#timeBarBg").width() - progressInt;
-				
+				progress--;
 				//$("#timeBar").style.width = progress + "px";
 				$("#timeBarBg").css('width' , progress + "px");
 
@@ -1633,8 +1612,7 @@
 							
 							drawEllipse(ctx2, parseInt(unescape(spotsData[0][i][0])), parseInt(unescape(spotsData[0][i][1])), parseInt(unescape(spotsData[0][i][2])), parseInt(unescape(spotsData[0][i][3])),"#FFFFFF", 1);
 							
-							//progress = Math.min(progress + 45, progressMax);
-							progress = Math.min($("#timeBarBg").width() + (20*progressInt), progressMax);
+							progress = Math.min(progress + 45, progressMax);
 							$("#timeBarBg").css('width' , progress + "px");
 							
 						}
@@ -1642,8 +1620,7 @@
 				}
 				
 				if (spotFlag==0) {
-					//progress = Math.max(progress - 100, 0);
-					progress = Math.max($("#timeBarBg").width() - (50*progressInt), 0);
+					progress = Math.max(progress - 100, 0);
 					$("#timeBarBg").css('width' , progress + "px");
 					//alert("wrong");
 				
@@ -1751,7 +1728,7 @@
 			
 				$.ajax({
 					type: "POST",
-					url: "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/getspots2.php",
+					url: "http://playchap.com/spotmania/getspots2.php",
 					data: encoded,
 					dataType: 'json'
 				}).done(function(data) {
@@ -1768,11 +1745,11 @@
 					//$("#clues").html(gameClues);					
 					
 					if ( $.browser.msie ) {						
-						img1.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][0];
-						img2.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][1];						
+						img1.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][0];
+						img2.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][1];						
 					} else {
-						img1.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][0];
-						img2.src = "https://secure141.inmotionhosting.com/~playsp5/playchap.com/spotmania/showImg.php?"+spotsData[1][1];
+						img1.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][0];
+						img2.src = "http://playchap.com/spotmania/showImg.php?"+spotsData[1][1];
 					}							
 					
 				});
