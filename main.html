@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<style>
+
+		body {
+			background-color:#555557;
+			padding:0;
+			margin:0;
+			overflow:hidden;
+			font-family:sans-serif;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+		canvas {
+			border:1px solid #000;
+			/*float:left;
+			clear:both;*/
+			/*background:url(http://i.imgur.com/Sge6mc6.png) repeat-x 0 -30px;
+			background-size:cover;*/
+		}
+	
+	</style>
+</head>
+<body onload="startGame()">
+
+<div id="test">test</div>
+<div id="test2">test2</div>
+ </body>
+
+
+<script>
+
+	var gPiece;
+	var myObstacles = [];
+	var myScore;
+	var mode=0;
+	var gArr = [];
+	var gStep = 0;
+	var gMode = 0;
+	var mouseIsDown = 0;
+	var mainTop = 0;
+	var mainWidth = 600;
+	var mainHeight = 400;
+	var mainOffsetX = 20;
+	var mainOffsetY = 20;
+
+
+	/*var canvas = document.getElementById('canvas'),
+		ctx = canvas.getContext('2d'),
+		tim,
+		bgx = 0,
+		isPlaying;*/
+
+	//canvas.width = window.innerWidth;
+	//canvas.height = window.innerHeight - 30;
+	
+	function startGame() {
+	
+		/*if (window.innerWidth > 800) {
+		  canvas.width = 800;
+		  canvas.height = 500;
+		}*/
+		
+		gArr = [
+				  [mainOffsetX + 0, mainOffsetY + 0],
+				  [mainOffsetX + 0, mainOffsetY + mainHeight],
+				  [mainOffsetX + mainWidth, mainOffsetY + mainHeight],
+				  [mainOffsetX + mainWidth, mainOffsetY + 0]
+				];
+		
+		//window.setTimeout(gArea.start, 5000);
+		gArea.start();
+		
+		/*ctx = gArea.context;
+		
+		//draw path along canvas edge
+		ctx.beginPath();
+		ctx.moveTo(0,0);
+		ctx.lineTo(0,500);
+		ctx.lineTo(800,500);
+		ctx.lineTo(800,0);
+		ctx.lineTo(0,0);
+
+		ctx.lineWidth = 5;
+		ctx.strokeStyle = "blue";
+
+		ctx.stroke();*/
+	
+		gPiece = new component(10, 10, "red", mainOffsetX, mainOffsetY);
+		
+		//gPiece.gravity = 0.05;
+		//myScore = new component("30px", "Consolas", "black", 280, 40, "text");
+		//gArea.start();
+	}
+	
+	var gArea = {
+		canvas : document.createElement("canvas"),
+		start : function() {
+			this.canvas.width = 800;
+			this.canvas.height = 500;
+			this.context = this.canvas.getContext("2d");
+			document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+			this.interval = setInterval(updateGameArea, 1);
+		},
+		clear : function() {
+			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		}
+	}
+
+
+
+	function component(width, height, color, x, y) {
+		this.width = width;
+		this.height = height;
+		this.speedX = 0;
+    	this.speedY = 0;
+		this.x = x;
+		this.y = y; 
+		this.update = function() {
+			ctx = gArea.context;
+			ctx.fillStyle = color;
+			ctx.fillRect(this.x, this.y, this.width, this.height);
+		}
+		this.newPos = function() {
+			this.x += this.speedX;
+			this.y += this.speedY; 
+		} 
+		
+	}
+	
+	function updateGameArea() {
+	
+		
+	
+		if (gMode == 0) {
+	
+			// if reached position, proceed to next point
+			if ((gPiece.x==gArr[gStep][0])&&(gPiece.y==gArr[gStep][1])) {
+				if (gStep +1 >= gArr.length) {
+					gStep = 0;
+				} else {
+					gStep++;
+				}
+			
+			}
+			
+			//cannot use step, use another method?
+			//check which step now
+			//
+			
+			
+			//figure out new direction
+			if (gPiece.y!=gArr[gStep][1]) {
+				if (gPiece.y<gArr[gStep][1]) {
+					gPiece.y++;
+				} else {
+					gPiece.y--;
+				}
+			
+			} 
+			else if (gPiece.x!=gArr[gStep][0]) {
+		
+				if (gPiece.x<gArr[gStep][0]) {
+					gPiece.x++;
+				} else {
+					gPiece.x--;
+				}
+			
+			}
+			
+			//find out touching which wall 
+			/*if (gPiece.y==mainOffsetY + 0) {
+				gPiece.x++;
+			} else if (gPiece.y==mainOffsetY + mainHeight) {
+				gPiece.x++;
+			} else if (gPiece.x==mainOffsetX + mainWidth) {
+				gPiece.y--;
+			} else if (gPiece.x==mainOffsetX + 0) {
+				gPiece.y--;
+			}*/
+			
+			
+		
+			//document.getElementById("test").innerHTML = gPiece.x + "," + gPiece.y + ":::" + gStep + ":::" + gArr[gStep][0] + "," + gArr[gStep][1];
+		} else {
+		
+			
+			
+			//if gMode is 1 and position not on wall advance in direction
+			//if gMode is 1 and position touched wall, change mode to 0
+		
+			if (gMode=="down") {
+				gPiece.y++;
+			} else if (gMode=="up") {
+				gPiece.y--;
+			} else if (gMode=="left") {
+				gPiece.x--;
+			} else if (gMode=="right") {
+				gPiece.x++;
+			}
+			
+			//if touching any walls, change mode
+			if (gPiece.y==mainOffsetY + 0) {
+				gMode=0;
+				checkStep();
+			} else if (gPiece.y==mainOffsetY + mainHeight) {
+				gMode=0;
+				checkStep();
+			} else if (gPiece.x==mainOffsetX + mainWidth) {
+				gMode=0;
+				checkStep();
+			} else if (gPiece.x==mainOffsetX + 0) {
+				gMode=0;
+				checkStep();
+			}
+		
+		
+		}
+		
+		
+		document.getElementById("test").innerHTML = gMode;
+		document.getElementById("test2").innerHTML = gStep;
+	
+	
+		//gPiece.speedY += 1; 
+		//gPiece.y +=2;
+		gArea.clear();
+		//gPiece.newPos();
+		
+		ctx = gArea.context;
+		ctx.strokeRect(mainOffsetX, mainOffsetY, mainWidth, mainHeight);
+		
+		gPiece.update();
+	}
+	
+	gArea.canvas.onmouseup= function(e){
+	
+		//dragOffset.x = e.x - mainLayer.trans.x;
+		//dragOffset.y = e.y - mainLayer.trans.y;
+		
+		//document.getElementById("test2").innerHTML = "mouse down";
+
+		mouseIsDown = 1;
+		
+		toggleMode ();
+		
+	}
+	
+	/*gArea.canvas.onmouseup = function(e){
+		
+		document.getElementById("test2").innerHTML = "mouse up";
+		mouseIsDown = 0;
+		toggleMode ();
+	}*/
+	
+	function toggleMode () {
+	
+	
+		//if gMode is 1, prev mouse mode is different change direction
+		
+		if (gMode == 0) {
+			//on leftwall
+			if (gPiece.y==mainOffsetY + 0) {
+				gMode="down";
+			} else if (gPiece.y==mainOffsetY + mainHeight) {
+				gMode="up";
+			} else if (gPiece.x==mainOffsetX + mainWidth) {
+				gMode="left";
+			} else if (gPiece.x==mainOffsetX + 0) {
+				gMode="right";
+			}
+		
+		} else if (gMode == "down") {
+			gMode="left";
+		} else if (gMode == "up") {
+			gMode="right";
+		} else if (gMode == "left") {
+			gMode="up";
+		} else if (gMode == "right") {
+			gMode="down";
+		}
+	
+	
+	}
+	function checkStep() {
+	
+	//alert("cs");
+	
+		//find out which step the point touches
+		var stepNow = 0;
+		//alert(stepNow);
+		for (var i = 0; i < gArr.length; i++) {
+			//alert(myStringArray[i]);
+			//Do something
+			
+			var pasti = i-1;
+			if (i-1<0) {
+				pasti=gArr.length-1;
+			}
+			var nexti = i+1;
+			if (i+1>gArr.length) {
+				nexti=0;
+			}
+			//if ((gPiece.x>gArr[i][0])&&(gPiece.x<gArr[nexti][0])&&(gPiece.y>gArr[i][1])&&(gPiece.y<gArr[nexti][1])) {
+			if ((gPiece.x>gArr[pasti][0])&&(gPiece.x<gArr[i][0])&&(gPiece.y>gArr[pasti][1])&&(gPiece.y<gArr[i][1])) {
+				stepNow = i;
+				//alert(i);
+			} else {
+				//alert("not:" + i);
+			}
+		}
+		
+		gStep = stepNow;
+	
+	}
+
+
+
+
+</script>
+
+</html>
