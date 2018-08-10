@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<style>
 
 		body {
@@ -42,12 +42,16 @@
 	var gArr = [];
 	var gStep = 0;
 	var gMode = 0;
+	var gTurn = "up";
 	var mouseIsDown = 0;
 	var mainTop = 0;
-	var mainWidth = 600;
+	var mainWidth = 300;
 	var mainHeight = 400;
 	var mainOffsetX = 20;
 	var mainOffsetY = 20;
+	var pWidth = 10;
+	var pHeight = 10;
+	var trace = [];
 
 
 	/*var canvas = document.getElementById('canvas'),
@@ -66,11 +70,20 @@
 		  canvas.height = 500;
 		}*/
 		
-		gArr = [
+		/*gArr = [
 				  [mainOffsetX + 0, mainOffsetY + 0],
 				  [mainOffsetX + 0, mainOffsetY + mainHeight],
 				  [mainOffsetX + mainWidth, mainOffsetY + mainHeight],
 				  [mainOffsetX + mainWidth, mainOffsetY + 0]
+				];*/
+				
+		gArr = [
+				  [mainOffsetX + 0, mainOffsetY + 0],
+				  [mainOffsetX + mainWidth, mainOffsetY + 0],
+				  [mainOffsetX + mainWidth, mainOffsetY + mainHeight],
+				  [mainOffsetX + 0, mainOffsetY + mainHeight]
+				  
+				  
 				];
 		
 		//window.setTimeout(gArea.start, 5000);
@@ -91,7 +104,7 @@
 
 		ctx.stroke();*/
 	
-		gPiece = new component(10, 10, "red", mainOffsetX, mainOffsetY);
+		gPiece = new component(pWidth, pHeight, "red", mainOffsetX, mainOffsetY);
 		
 		//gPiece.gravity = 0.05;
 		//myScore = new component("30px", "Consolas", "black", 280, 40, "text");
@@ -101,11 +114,12 @@
 	var gArea = {
 		canvas : document.createElement("canvas"),
 		start : function() {
-			this.canvas.width = 800;
+			this.canvas.width = 400;
 			this.canvas.height = 500;
 			this.context = this.canvas.getContext("2d");
 			document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-			this.interval = setInterval(updateGameArea, 1);
+			this.frameNo = 0;
+			this.interval = setInterval(updateGameArea, 20);
 		},
 		clear : function() {
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -124,7 +138,29 @@
 		this.update = function() {
 			ctx = gArea.context;
 			ctx.fillStyle = color;
-			ctx.fillRect(this.x, this.y, this.width, this.height);
+			if (gMode==0) {
+				ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2), this.width, this.height);
+			} else {
+			
+				if (gTurn == "up") {
+					ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2), pWidth, pHeight);
+					ctx.fillStyle = "green";
+					ctx.fillRect(this.x-(pWidth/2), this.y-5-(pHeight/2), pWidth, 5);
+				} else if (gTurn == "down") {
+					ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2), pWidth, pHeight);
+					ctx.fillStyle = "green";
+					ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2)+pHeight, pWidth, 5);
+				} else if (gTurn == "left") {
+					ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2), pWidth, pHeight);
+					ctx.fillStyle = "green";
+					ctx.fillRect(this.x-5-(pWidth/2), this.y-(pHeight/2), 5,  pHeight);
+				} else if (gTurn == "right") {
+					ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2), pWidth, pHeight);
+					ctx.fillStyle = "green";
+					ctx.fillRect(this.x-(pWidth/2) + pWidth, this.y-(pHeight/2), 5,  pHeight);
+				}
+				
+			}
 		}
 		this.newPos = function() {
 			this.x += this.speedX;
@@ -135,9 +171,40 @@
 	
 	function updateGameArea() {
 	
+		gArea.frameNo += 1;
 		
+		if (gArea.frameNo == 1 || everyinterval(50)) {
+			if (gMode=="down") {
+				if (gTurn == "left") {
+					gTurn = "right";
+				} else {
+					gTurn = "left";
+				}
+			} else if (gMode=="up") {
+				if (gTurn == "left") {
+					gTurn = "right";
+				} else {
+					gTurn = "left";
+				}
+			} else if (gMode=="left") {
+				if (gTurn == "up") {
+					gTurn = "down";
+				} else {
+					gTurn = "up";
+				}
+			} else if (gMode=="right") {
+				if (gTurn == "up") {
+					gTurn = "down";
+				} else {
+					gTurn = "up";
+				}
+				
+			}
+		
+		}
 	
 		if (gMode == 0) {
+			
 	
 			// if reached position, proceed to next point
 			if ((gPiece.x==gArr[gStep][0])&&(gPiece.y==gArr[gStep][1])) {
@@ -196,28 +263,90 @@
 		
 			if (gMode=="down") {
 				gPiece.y++;
+				
 			} else if (gMode=="up") {
 				gPiece.y--;
+				
 			} else if (gMode=="left") {
 				gPiece.x--;
+				
 			} else if (gMode=="right") {
 				gPiece.x++;
+				
 			}
 			
 			//if touching any walls, change mode
-			if (gPiece.y==mainOffsetY + 0) {
+			//TODO change to checkpath!!!
+			
+			
+			/*if (gPiece.y==mainOffsetY + 0) {
 				gMode=0;
-				checkStep();
+				trace = [];
+				setStep();
 			} else if (gPiece.y==mainOffsetY + mainHeight) {
 				gMode=0;
-				checkStep();
+				trace = [];
+				setStep();
 			} else if (gPiece.x==mainOffsetX + mainWidth) {
 				gMode=0;
-				checkStep();
+				trace = [];
+				setStep();
 			} else if (gPiece.x==mainOffsetX + 0) {
 				gMode=0;
-				checkStep();
+				trace = [];
+				setStep();
+			}*/
+			
+			var checkStepArr = getStep(gPiece.x, gPiece.y);
+			
+			//if touch the borders change mode
+			if (checkStepArr[0] != -1) {
+				gMode=0;
+				
+					//enter final insertion position 
+					trace.push([gPiece.x, gPiece.y]);
+				
+					//get origin insertion point 1 path
+					var path1 = getStep(trace[0][0],trace[0][1]);
+					
+					//get final insertion point 2 path
+					var path2 = getStep(gPiece.x, gPiece.y);
+					
+					console.log("path1:" + path1[0] + ", path2:" + path2[0]);
+					
+					//create now pathArrs
+					var newPathArr1 = [];
+					var newPathArr2 = [];
+					
+					//Insert new paths starting from path 0
+					//what if path 1 = 0?
+					for (var i = 0; i < path1[0]; i++) {
+						newPathArr1.push (gArr[i]);
+					}
+					//insert trace path
+					for (var i = 0; i < trace.length; i++) {
+						newPathArr1.push (trace[i]);
+					}
+					//insert paths after insertion point 2
+					for (var i = path2[0]; i < gArr.length; i++) {
+						newPathArr1.push (gArr[i]);
+					}
+					
+					console.log(gArr);
+					console.log(trace);
+					
+					//set new path
+					gArr = newPathArr1;
+					
+					setStep();
+					
+					console.log(gArr);
+				
+					//reset trace
+					trace = [];
 			}
+			
+			
 		
 		
 		}
@@ -233,12 +362,62 @@
 		//gPiece.newPos();
 		
 		ctx = gArea.context;
+		
+		/*
+		ctx.beginPath();
+		ctx.rect(mainOffsetX, mainOffsetY, mainWidth, mainHeight);
+		ctx.fillStyle = "gray";
+		ctx.fill();
+		
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "yellow";
 		ctx.strokeRect(mainOffsetX, mainOffsetY, mainWidth, mainHeight);
+		ctx.stroke();
+		*/
+		
+		ctx.beginPath();
+		ctx.moveTo(gArr[0][0],gArr[0][1]);
+		for (var i = 0; i < gArr.length; i++) {
+			ctx.lineTo(gArr[i][0],gArr[i][1]);
+		}
+		ctx.lineTo(gArr[0][0],gArr[0][1]);
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "yellow";
+		ctx.stroke();
+		
+		if (gMode!=0) {
+			drawTrace();
+		}
 		
 		gPiece.update();
 	}
 	
-	gArea.canvas.onmouseup= function(e){
+	function drawTrace () {
+		//draw out path from trace
+		if (trace.length>0) {
+			ctx = gArea.context;
+			ctx.beginPath();
+			ctx.moveTo(trace[0][0],trace[0][1]);
+			for (var i = 0; i < trace.length; i++) {
+			
+				ctx.lineTo(trace[i][0],trace[i][1]);
+			}
+			ctx.lineTo(gPiece.x,gPiece.y);
+
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = "blue";
+			ctx.stroke();
+			
+/*			ctx.beginPath(); 
+			ctx.lineWidth="5";
+			ctx.strokeStyle="green"; // Green path
+			ctx.moveTo(0,75);
+			ctx.lineTo(250,75);
+			ctx.stroke();*/
+		}
+	}
+	
+	window.onmouseup= function(e){
 	
 		//dragOffset.x = e.x - mainLayer.trans.x;
 		//dragOffset.y = e.y - mainLayer.trans.y;
@@ -264,59 +443,217 @@
 		//if gMode is 1, prev mouse mode is different change direction
 		
 		if (gMode == 0) {
+		
 			//on leftwall
-			if (gPiece.y==mainOffsetY + 0) {
+			/*if (gPiece.y == mainOffsetY + 0) {
 				gMode="down";
-			} else if (gPiece.y==mainOffsetY + mainHeight) {
+				var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
+			} else if (gPiece.y == mainOffsetY + mainHeight) {
 				gMode="up";
-			} else if (gPiece.x==mainOffsetX + mainWidth) {
+				var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
+			} else if (gPiece.x == mainOffsetX + mainWidth) {
 				gMode="left";
-			} else if (gPiece.x==mainOffsetX + 0) {
+				var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
+			} else if (gPiece.x == mainOffsetX + 0) {
 				gMode="right";
+				var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
+			}*/
+			
+			var checkStepArr = setStep();
+			
+			//alert(checkStepArr[0] + "::" + checkStepArr[1]);
+			
+			//check orientation and set direction
+			if (checkStepArr[0] != -1) {
+			
+				var posArr = [gPiece.x,gPiece.y];
+				trace.push(posArr);
+				
+				if (checkStepArr[1]=="up") {
+					gMode="right";
+				} else if (checkStepArr[1]=="down") {
+					gMode="left";
+				} else if (checkStepArr[1]=="left") {
+					gMode="up";
+				} else if (checkStepArr[1]=="right") {
+					gMode="down";
+				}
+				
+				
 			}
+			
+			
+			
 		
 		} else if (gMode == "down") {
-			gMode="left";
+			gMode = gTurn;
+			gTurn = "up";
+			var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
 		} else if (gMode == "up") {
-			gMode="right";
+			gMode = gTurn;
+			gTurn = "up";
+			var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
 		} else if (gMode == "left") {
-			gMode="up";
+			gMode = gTurn;
+			gTurn = "left";
+			var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
 		} else if (gMode == "right") {
-			gMode="down";
+			gMode = gTurn;
+			gTurn = "left";
+			var posArr = [gPiece.x,gPiece.y];
+			trace.push(posArr);
 		}
 	
 	
 	}
-	function checkStep() {
 	
-	//alert("cs");
+	function getStep(xIn, yIn) {
 	
+		//alert("cs");
+		//console.log("checkstep start");
+	
+		var dirNow= -1;
 		//find out which step the point touches
-		var stepNow = 0;
+		var stepNow = -1;
 		//alert(stepNow);
 		for (var i = 0; i < gArr.length; i++) {
-			//alert(myStringArray[i]);
-			//Do something
-			
+		
+		
+		
 			var pasti = i-1;
 			if (i-1<0) {
 				pasti=gArr.length-1;
 			}
-			var nexti = i+1;
+			/*var nexti = i+1;
 			if (i+1>gArr.length) {
 				nexti=0;
+			}*/
+			
+			//console.log("checking step i="+i);
+			//console.log("- pasti="+pasti);
+			
+			var na1;
+			var na2;
+		
+			//check x same or y same as prev point
+			if (gArr[pasti][0]==gArr[i][0]) {
+				//console.log("step with same X:" + gArr[pasti][0] );
+				
+				if (xIn==gArr[pasti][0]) {
+					//console.log("gpiece with same X:" + xIn );
+				
+						if (gArr[pasti][1]>gArr[i][1]) {
+							na1 = gArr[pasti][1];
+							na2 = gArr[i][1];
+							dirNow = "up";
+						
+						} else {
+							na2 = gArr[pasti][1];
+							na1 = gArr[i][1];
+							dirNow = "down";
+						}
+						
+						//console.log("y na1="+na1);
+						//console.log("y na2="+na2);
+						
+						if (yIn>na2 && yIn<na1) {
+							stepNow = i;
+							//console.log("match type 1:" + i);
+						} else {
+							//console.log("nomatch type 1:" + i);
+						}
+				
+					
+				} else {
+					//console.log("gpiece not with same X:" + xIn );
+				}
+			
+			} else {
+				//console.log("step with same Y" + gArr[pasti][1] + "," +  + gArr[i][1] );
+			
+				if (yIn==gArr[pasti][1]) {
+					//console.log("gpiece with same Y:" + yIn );
+			
+						if (gArr[pasti][0]>gArr[i][0]) {
+							na1 = gArr[pasti][0];
+							na2 = gArr[i][0];
+							dirNow = "left";
+					
+						} else {
+							na2 = gArr[pasti][0];
+							na1 = gArr[i][0];
+							dirNow = "right";
+						}
+						
+						//console.log("x na1="+na1);
+						//console.log("x na2="+na2);
+					
+						if (xIn>na2 && xIn<na1) {
+							stepNow = i;
+							//console.log("match type 2:" + i);
+						} else {
+							//console.log("nomatch type 2:" + i);
+						}
+				} else {
+					//console.log("gpiece not with same Y:" + yIn );
+				}
+				
 			}
+		
+		
+			
+			/*
+			
 			//if ((gPiece.x>gArr[i][0])&&(gPiece.x<gArr[nexti][0])&&(gPiece.y>gArr[i][1])&&(gPiece.y<gArr[nexti][1])) {
 			if ((gPiece.x>gArr[pasti][0])&&(gPiece.x<gArr[i][0])&&(gPiece.y>gArr[pasti][1])&&(gPiece.y<gArr[i][1])) {
 				stepNow = i;
 				//alert(i);
 			} else {
 				//alert("not:" + i);
-			}
+			}*/
 		}
 		
-		gStep = stepNow;
+		/*var pasti2 = stepNow-1;
+			if (stepNow-1<0) {
+				pasti2=gArr.length-1;
+			}
+		
+		gStep = pasti2 ;
+		alert("step:" + pasti2 );*/
+		//if (stepNow != -1) {
+			//gStep = stepNow ;
+		//}
+		//console.log("step:" + stepNow );
+		//console.log("checkstep end");
+		
+		var stepNowArr = [stepNow, dirNow];
+		
+		return stepNowArr;
 	
+	}
+	function setStep() {
+	
+		var getStepArr = getStep(gPiece.x, gPiece.y);
+		
+		if (getStepArr[0] != -1) {
+			gStep = getStepArr[0] ;
+		}
+		//console.log("step:" + getStepArr[0] );
+		
+		return getStepArr;
+	
+	}
+	
+	function everyinterval(n) {
+		if ((gArea.frameNo / n) % 1 == 0) {return true;}
+		return false;
 	}
 
 
