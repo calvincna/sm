@@ -119,7 +119,8 @@
 			this.context = this.canvas.getContext("2d");
 			document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 			this.frameNo = 0;
-			this.interval = setInterval(updateGameArea, 20);
+			//this.interval = setInterval(updateGameArea, 20);
+			this.interval = setInterval(updateGameArea, 10);
 		},
 		clear : function() {
 			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -301,49 +302,102 @@
 			
 			//if touch the borders change mode
 			if (checkStepArr[0] != -1) {
+				
 				gMode=0;
 				
-					//enter final insertion position 
-					trace.push([gPiece.x, gPiece.y]);
+				//enter final insertion position 
+				trace.push([gPiece.x, gPiece.y]);
+			
+				//get origin insertion point 1 path
+				var tpath1 = getStep(trace[0][0],trace[0][1]);
 				
-					//get origin insertion point 1 path
-					var path1 = getStep(trace[0][0],trace[0][1]);
-					
-					//get final insertion point 2 path
-					var path2 = getStep(gPiece.x, gPiece.y);
-					
-					console.log("path1:" + path1[0] + ", path2:" + path2[0]);
-					
-					//create now pathArrs
-					var newPathArr1 = [];
-					var newPathArr2 = [];
-					
-					//Insert new paths starting from path 0
-					//what if path 1 = 0?
-					for (var i = 0; i < path1[0]; i++) {
-						newPathArr1.push (gArr[i]);
-					}
-					//insert trace path
-					for (var i = 0; i < trace.length; i++) {
-						newPathArr1.push (trace[i]);
-					}
-					//insert paths after insertion point 2
-					for (var i = path2[0]; i < gArr.length; i++) {
-						newPathArr1.push (gArr[i]);
-					}
-					
-					console.log(gArr);
-					console.log(trace);
-					
-					//set new path
-					gArr = newPathArr1;
-					
-					setStep();
-					
-					console.log(gArr);
+				//get final insertion point 2 path
+				//var tpath2 = getStep(gPiece.x, gPiece.y);
+				var tpath2 = getStep(trace[trace.length-1][0],trace[trace.length-1][1]);
 				
-					//reset trace
-					trace = [];
+				var path1;
+				var path2;
+				
+				//Set closer to path 0 point as first path
+				if (tpath2[0]>tpath1[0]) {
+					path1 = tpath1;
+					path2 = tpath2;
+					
+					
+					
+				} else if (tpath2[0]<tpath1[0]) {
+					path1 = tpath2;
+					path2 = tpath1;
+					
+					trace = trace.reverse();
+					
+					
+				} else if (tpath2[0]==tpath1[0]) {
+					//check which came first
+					if (trace[0][0] == trace[trace.length-1][0]) {
+						if (trace[0][1] < trace[trace.length-1][1]) {
+							path1 = tpath1;
+							path2 = tpath2;
+						} else {
+							path1 = tpath2;
+							path2 = tpath1;
+					
+							trace = trace.reverse();
+						}
+					} else {
+						if (trace[0][0] < trace[trace.length-1][0]) {
+							path1 = tpath1;
+							path2 = tpath2;
+						} else {
+							path1 = tpath2;
+							path2 = tpath1;
+					
+							trace = trace.reverse();
+						}
+						
+					}
+					
+					
+				}
+					
+				console.log("gPiece:" + gPiece.x + ", " + gPiece.y);
+				console.log("path1:" + path1[0] + ", path2:" + path2[0]);
+				
+				//create now pathArrs
+				var newPathArr1 = [];
+				var newPathArr2 = [];
+				
+				//Insert new paths starting from path 0
+				//what if path 1 = 0?
+				for (var i = 0; i < path1[0]; i++) {
+					newPathArr1.push (gArr[i]);
+				}
+				//insert trace path
+				for (var i = 0; i < trace.length; i++) {
+					newPathArr1.push (trace[i]);
+				}
+				//insert paths after insertion point 2
+				for (var i = path2[0]; i < gArr.length; i++) {
+					newPathArr1.push (gArr[i]);
+				}
+				
+				console.log(gArr);
+				console.log(trace);
+				
+				//set new path
+				gArr = newPathArr1;
+				
+				setStep();
+				
+				var getnewStep = getStep(gPiece.x, gPiece.y);
+				
+				//alert(gStep);
+				//alert(getnewStep[0] + "::" + getnewStep[1]);
+				
+				console.log(gArr);
+			
+				//reset trace
+				trace = [];
 			}
 			
 			
@@ -376,6 +430,16 @@
 		*/
 		
 		ctx.beginPath();
+		
+		ctx.moveTo(gArr[0][0],gArr[0][1]);
+		for (var i = 0; i < gArr.length; i++) {
+			ctx.lineTo(gArr[i][0],gArr[i][1]);
+		}
+		ctx.lineTo(gArr[0][0],gArr[0][1]);
+		ctx.fillStyle = "gray";
+		ctx.fill();
+		
+		
 		ctx.moveTo(gArr[0][0],gArr[0][1]);
 		for (var i = 0; i < gArr.length; i++) {
 			ctx.lineTo(gArr[i][0],gArr[i][1]);
@@ -563,7 +627,7 @@
 						//console.log("y na1="+na1);
 						//console.log("y na2="+na2);
 						
-						if (yIn>na2 && yIn<na1) {
+						if (yIn>=na2 && yIn<na1) {
 							stepNow = i;
 							//console.log("match type 1:" + i);
 						} else {
@@ -595,7 +659,7 @@
 						//console.log("x na1="+na1);
 						//console.log("x na2="+na2);
 					
-						if (xIn>na2 && xIn<na1) {
+						if (xIn>na2 && xIn<=na1) {
 							stepNow = i;
 							//console.log("match type 2:" + i);
 						} else {
