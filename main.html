@@ -54,6 +54,18 @@
 	var trace = [];
 	
 	var startArea = mainWidth * mainHeight;
+	
+	var pattern1,pattern2;
+	
+	/*var img1=new Image();
+	img1.onload=startGame();
+	img1.src="img1a.jpg";
+	
+	var img2=new Image();
+	img2.onload=startGame()
+	img2.src="img1b.jpg";
+	
+	var imgCount=2;*/
 
 
 	/*var canvas = document.getElementById('canvas'),
@@ -66,6 +78,10 @@
 	//canvas.height = window.innerHeight - 30;
 	
 	function startGame() {
+	
+		//if(--imgCount>0){return;}
+		 // pattern1=ctx.createPattern(img1,'repeat');
+		  //pattern2=ctx.createPattern(img2,'repeat');
 	
 		/*if (window.innerWidth > 800) {
 		  canvas.width = 800;
@@ -87,6 +103,8 @@
 				  
 				  
 				];
+				
+				
 		
 		//window.setTimeout(gArea.start, 5000);
 		gArea.start();
@@ -476,6 +494,8 @@
 		
 		ctx.beginPath();
 		
+		ctx.fillStyle = pattern1;
+		
 		ctx.moveTo(gArr[0][0],gArr[0][1]);
 		for (var i = 0; i < gArr.length; i++) {
 			ctx.lineTo(gArr[i][0],gArr[i][1]);
@@ -672,7 +692,7 @@
 						//console.log("y na1="+na1);
 						//console.log("y na2="+na2);
 						
-						if (yIn>=na2 && yIn<na1) {
+						if (yIn>=na2 && yIn<=na1) {
 							stepNow = i;
 							//console.log("match type 1:" + i);
 						} else {
