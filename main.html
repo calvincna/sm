@@ -52,6 +52,8 @@
 	var pWidth = 10;
 	var pHeight = 10;
 	var trace = [];
+	
+	var startArea = mainWidth * mainHeight;
 
 
 	/*var canvas = document.getElementById('canvas'),
@@ -323,12 +325,9 @@
 					path1 = tpath1;
 					path2 = tpath2;
 					
-					
-					
 				} else if (tpath2[0]<tpath1[0]) {
 					path1 = tpath2;
 					path2 = tpath1;
-					
 					trace = trace.reverse();
 					
 					
@@ -341,7 +340,6 @@
 						} else {
 							path1 = tpath2;
 							path2 = tpath1;
-					
 							trace = trace.reverse();
 						}
 					} else {
@@ -351,7 +349,6 @@
 						} else {
 							path1 = tpath2;
 							path2 = tpath1;
-					
 							trace = trace.reverse();
 						}
 						
@@ -367,6 +364,7 @@
 				var newPathArr1 = [];
 				var newPathArr2 = [];
 				
+				//create path array 1
 				//Insert new paths starting from path 0
 				//what if path 1 = 0?
 				for (var i = 0; i < path1[0]; i++) {
@@ -381,11 +379,58 @@
 					newPathArr1.push (gArr[i]);
 				}
 				
+				//create path array 2
+				trace = trace.reverse();
+				
+				for (var i = (path1[0]); i < (path2[0]); i++) {
+					newPathArr2.push (gArr[i]);
+				}
+				//insert trace path
+				for (var i = 0; i < trace.length; i++) {
+					newPathArr2.push (trace[i]);
+				}
+				
+				
 				console.log(gArr);
 				console.log(trace);
 				
-				//set new path
-				gArr = newPathArr1;
+				//compare both to compare which has lesser area
+				var area1x = [];
+				var area1y = [];
+				var area1p = newPathArr1.length;
+				
+				for (var i = 0; i <  newPathArr1.length; i++) {
+					area1x.push (newPathArr1[i][0]);
+					area1y.push (newPathArr1[i][1]);
+				}
+				
+				var area1 = Math.abs(polygonArea(area1x, area1y, area1p)) ;
+				
+				
+				var area2x = [];
+				var area2y = [];
+				var area2p = newPathArr2.length;
+				
+				for (var i = 0; i <  newPathArr2.length; i++) {
+					area2x.push (newPathArr2[i][0]);
+					area2y.push (newPathArr2[i][1]);
+				}
+				
+				var area2 = Math.abs(polygonArea(area2x, area2y, area2p)) ;
+				
+				//alert("startArea:" + startArea + ", area1:" + area1 + ", area2:" + area2 );
+				
+				var bigArea = area1;
+				
+				if (area1>area2) {
+					gArr = newPathArr1;
+				} else {
+					//set new path
+					gArr = newPathArr2;
+					bigArea = area2;
+				}
+				
+				document.getElementById("test").innerHTML = (bigArea/startArea)*100;
 				
 				setStep();
 				
@@ -406,8 +451,8 @@
 		}
 		
 		
-		document.getElementById("test").innerHTML = gMode;
-		document.getElementById("test2").innerHTML = gStep;
+		//document.getElementById("test").innerHTML = gMode;
+		//document.getElementById("test2").innerHTML = gStep;
 	
 	
 		//gPiece.speedY += 1; 
@@ -719,6 +764,21 @@
 		if ((gArea.frameNo / n) % 1 == 0) {return true;}
 		return false;
 	}
+	
+	//X, Y	Arrays of the x and y coordinates of the vertices, traced in a clockwise direction, starting at any vertex. If you trace them counterclockwise, the result will be correct but have a negative sign.
+	//numPoints	The number of vertices
+	function polygonArea(X, Y, numPoints) 
+	{ 
+	  area = 0;         // Accumulates area in the loop
+	  j = numPoints-1;  // The last vertex is the 'previous' one to the first
+
+	  for (i=0; i<numPoints; i++)
+		{ area = area +  (X[j]+X[i]) * (Y[j]-Y[i]); 
+		  j = i;  //j is previous vertex to i
+		}
+	  return area/2;
+	}
+
 
 
 
