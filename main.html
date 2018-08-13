@@ -28,8 +28,8 @@
 </head>
 <body>
 
-<div id="test">test</div>
-<div id="test2">test2</div>
+<div id="test" style="padding:50px;">test</div>
+<div id="test2" style="padding:50px;">test2</div>
  </body>
 
 
@@ -277,7 +277,7 @@
 				
 				if( checkStep1[1]=="up" || checkStep1[1]=="down") {
 					this.randX = -1*this.randX;
-				} else {
+				} else if( checkStep1[1]=="left" || checkStep1[1]=="right") {
 					this.randY = -1*this.randY;
 				} 
 				
@@ -288,6 +288,7 @@
 				//newX = this.x + this.randX;
 				//newY = this.y + this.randY;
 			}
+			
 			//var point2 = [newX,newY];
 			//if (inside(point2, gArr)) {
 				this.x += this.randX;
@@ -712,6 +713,7 @@
 				
 				
 				document.getElementById("test").innerHTML = (bigArea/startArea)*100;
+				document.getElementById("test2").innerHTML = gArr.length;
 				
 				setStep();
 				
