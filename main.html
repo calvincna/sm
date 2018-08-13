@@ -26,7 +26,7 @@
 	
 	</style>
 </head>
-<body onload="startGame()">
+<body>
 
 <div id="test">test</div>
 <div id="test2">test2</div>
@@ -53,19 +53,57 @@
 	var pHeight = 10;
 	var trace = [];
 	
+	var en1;
+	var en2;
+	
 	var startArea = mainWidth * mainHeight;
 	
-	var pattern1,pattern2;
+	var pattern1;
+	var pattern2;
 	
-	/*var img1=new Image();
-	img1.onload=startGame();
-	img1.src="img1a.jpg";
+	var gArea = {
+		canvas : document.createElement("canvas"),
+		start : function() {
+			this.canvas.width = 400;
+			this.canvas.height = 500;
+			this.context = this.canvas.getContext("2d");
+			document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+			this.frameNo = 0;
+			this.interval = setInterval(updateGameArea, 20);
+			//this.interval = setInterval(updateGameArea, 50);
+		},
+		clear : function() {
+			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		}
+	}
 	
-	var img2=new Image();
-	img2.onload=startGame()
-	img2.src="img1b.jpg";
+	//startGame();
 	
-	var imgCount=2;*/
+	//var img1=new Image();
+	//img1.onload=startGame();
+	//img1.src="img1a.jpg";
+	//img1.src="https://calvincna.github.io/sm/img1a.jpg";
+	//img1.src="https://www.w3resource.com/html5-canvas/images/pattern1.png";
+	//img1.src = "http://www.qygjxz.com/data/out/165/5445598-natural-images.jpg";
+	
+	var img = new Image();
+	img.src = "img1a.jpg";
+	img.onload = function () { 
+		startGame();
+	}
+  
+	var img2 = new Image();
+	img2.src = "img1b.jpg";
+	img2.onload = function () { 
+		startGame();
+	}
+  
+	
+	/*var img2=new Image();
+	img2.onload=startGame();
+	img2.src="img1b.jpg";*/
+	
+	var imgCount=2;
 
 
 	/*var canvas = document.getElementById('canvas'),
@@ -79,9 +117,8 @@
 	
 	function startGame() {
 	
-		//if(--imgCount>0){return;}
-		 // pattern1=ctx.createPattern(img1,'repeat');
-		  //pattern2=ctx.createPattern(img2,'repeat');
+		if(--imgCount>0){return;}
+		  
 	
 		/*if (window.innerWidth > 800) {
 		  canvas.width = 800;
@@ -109,8 +146,11 @@
 		//window.setTimeout(gArea.start, 5000);
 		gArea.start();
 		
-		/*ctx = gArea.context;
+		ctx = gArea.context;
+		pattern1=ctx.createPattern(img,'repeat');
+		pattern2=ctx.createPattern(img2,'repeat');
 		
+		/*
 		//draw path along canvas edge
 		ctx.beginPath();
 		ctx.moveTo(0,0);
@@ -126,25 +166,165 @@
 	
 		gPiece = new component(pWidth, pHeight, "red", mainOffsetX, mainOffsetY);
 		
+		en1 = new enemyComp(pWidth, pHeight, "white", 300, 300);
+		
+		//en2=enComp();
+		
 		//gPiece.gravity = 0.05;
 		//myScore = new component("30px", "Consolas", "black", 280, 40, "text");
 		//gArea.start();
 	}
 	
-	var gArea = {
-		canvas : document.createElement("canvas"),
-		start : function() {
-			this.canvas.width = 400;
-			this.canvas.height = 500;
-			this.context = this.canvas.getContext("2d");
-			document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-			this.frameNo = 0;
-			//this.interval = setInterval(updateGameArea, 20);
-			this.interval = setInterval(updateGameArea, 10);
-		},
-		clear : function() {
-			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	// inital coordinates of the black square
+	var x = 120;
+	var y = 150;
+
+	// let the square move "around" this y value
+	var y_fix = y;
+	// let the square this pixels up and down the fixed y value
+	var range = 20;
+
+
+	// we will calculate the sin-values from the angle variable
+	// since the Math.sin function is working in radiants 
+	// we must increase the angle value in small steps -> anglespeed
+	// the bigger the anglespeed value is, the wider the sine gets
+	var angle = 0;
+	var anglespeed = 0.10;
+
+	// speed of the movement
+	// initially 1, means it increases the x value
+	// if you would set it to 0, the object would move up and down
+	// at the same spot
+	var speed = 1;
+
+	function enComp() {
+
+		this.active = true;
+		this.age = Math.floor(Math.random() * 128);
+		this.color = "#A2B";
+		//this.x = mainWidth / 4 + Math.random() * mainWidth / 2;
+		this.x = 80;
+		this.y = 50;
+		this.xVelocity = 0
+		this.yVelocity = 2;
+		this.width = 15;
+		this.height = 15;
+
+		this.inBounds = function() {
+		return this.x >= 0 && this.x <= mainWidth &&
+			this.y >= 0 && this.y <= mainHeight;
+		};
+
+		this.draw = function() {
+			ctx = gArea.context;
+			ctx.fillStyle = this.color;
+			ctx.fillRect(this.x, this.y, this.width, this.height);
+		};
+
+		this.update = function() {
+			this.x += this.xVelocity;
+			this.y += this.yVelocity;
+
+			this.xVelocity = 3 * Math.sin(this.age * Math.PI / 42);
+			this.age++;
+			this.active = this.active && this.inBounds();
+		};
+
+		return this;
+	};
+
+	
+	function enemyComp(width, height, color, x, y) {
+		this.width = width;
+		this.height = height;
+		this.speedX = 0;
+    	this.speedY = 0;
+		this.x = x;
+		this.y = y; 
+		this.randX = 5;
+		this.randY = 5;
+		this.update = function() {
+			ctx = gArea.context;
+			ctx.fillStyle = color;
+			
+			//this.x += this.randX;
+			//this.y += this.randY;
+			
+			var newX = this.x + this.randX;
+			var newY = this.y + this.randY;
+			
+			var checkStep1 = getStep(newX, newY);
+			
+			
+			if (checkStep1[0]>-1) {
+			
+				//alert("wall");
+				
+				//change direction
+				/*if (Math.round(Math.random())>0) {
+					this.randX = 1
+				} else {
+					this.randX = -1
+				}
+				if (Math.round(Math.random())>0) {
+					this.randY = 1
+				} else {
+					this.randY = -1
+				}*/
+				//this.randX = getRandomIntRange (1, 10);
+				//this.randX = getRandomIntRange (1, 10);
+				
+				if( checkStep1[1]=="up" || checkStep1[1]=="down") {
+					this.randX = -1*this.randX;
+				} else {
+					this.randY = -1*this.randY;
+				} 
+				
+				
+				
+				
+				
+				//newX = this.x + this.randX;
+				//newY = this.y + this.randY;
+			}
+			//var point2 = [newX,newY];
+			//if (inside(point2, gArr)) {
+				this.x += this.randX;
+				this.y += this.randY;
+			//}
+			
+
+   			 // increase value for sin calculation
+   			// angle += anglespeed;
+			
+			//this.y = Math.sin(gArea.frameNo * Math.PI);
+			//this.y = y_fix + Math.sin(angle) * range;
+    		//this.x += speed;
+    		
+    		//if(x>500) {
+				//x = 0;
+				// reset the range - if it has been manipulated
+				//range = 20;
+			//}
+			
+			
+			
+			ctx.fillRect(this.x-(pWidth/2), this.y-(pHeight/2), this.width, this.height);
+			
+			//if (getStep(this.x, this.y)<0) {
+				//document.getElementById("test2").innerHTML = getStep(this.x, this.y);
+				//}
+				
+				//document.getElementById("test2").innerHTML = this.x +":::" +this.y;
+				//document.getElementById("test2").innerHTML = getStep(this.x, this.y);
+			
 		}
+		this.newPos = function() {
+			this.x += this.speedX;
+			this.y += this.speedY; 
+		} 
+		
 	}
 
 
@@ -237,9 +417,6 @@
 			
 			}
 			
-			//cannot use step, use another method?
-			//check which step now
-			//
 			
 			
 			//figure out new direction
@@ -351,7 +528,7 @@
 					
 				} else if (tpath2[0]==tpath1[0]) {
 					//check which came first
-					if (trace[0][0] == trace[trace.length-1][0]) {
+					/*if (trace[0][0] == trace[trace.length-1][0]) {
 						if (trace[0][1] < trace[trace.length-1][1]) {
 							path1 = tpath1;
 							path2 = tpath2;
@@ -370,12 +547,89 @@
 							trace = trace.reverse();
 						}
 						
+					}*/
+					
+					path1 = tpath1;
+					path2 = tpath2;
+					//alert(path1[1]);
+					
+					//check path which is nearer to path point
+					if (path1[1]=="up") {
+						if (trace[0][1] < trace[trace.length-1][1]) {
+							trace = trace.reverse();
+						}
+					} else if (path1[1]=="down") {
+						if (trace[0][1] > trace[trace.length-1][1]) {
+							trace = trace.reverse();
+						}
+					} else if (path1[1]=="left") {
+						if (trace[0][0] < trace[trace.length-1][0]) {
+							trace = trace.reverse();
+						}
+					} else if (path1[1]=="right") {
+						//alert(trace[0][1] + ":::" + trace[trace.length-1][1]);
+						if (trace[0][0] > trace[trace.length-1][0]) {
+							trace = trace.reverse();
+						}
 					}
+					
+					
+					/*
+					//check path which is nearer to path point
+					if (trace[0][0] == trace[trace.length-1][0]) {
+						//check direction of y
+						var pasti = tpath2[0]-1;
+						if (tpath2[0]-1<0) {
+							pasti=gArr.length-1;
+						}
+						
+						if (gArr[tpath2[0]][1]<gArr[pasti][1]) {
+							//upwards
+							if (trace[0][0] < trace[trace.length-1][0]) {
+								
+								trace = trace.reverse();
+								
+							}
+						} else {
+							//dnwards
+							if (trace[0][0] < trace[trace.length-1][0]) {
+							
+							} else {
+								trace = trace.reverse();
+							}
+							
+						}
+						
+						
+					} else {
+						//check direction of x
+						
+						var pasti = tpath2[0]-1;
+						if (tpath2[0]-1<0) {
+							pasti=gArr.length-1;
+						}
+						
+						if (gArr[tpath2[0]][0]<gArr[pasti][0]) {
+							//rightward
+							if (trace[0][0] < trace[trace.length-1][0]) {
+									
+							} else {
+								
+							}
+						} else {
+							//leftwards
+							if (trace[0][0] < trace[trace.length-1][0]) {
+								trace = trace.reverse();
+								}
+						}
+						
+					} */
 					
 					
 				}
 					
-				console.log("gPiece:" + gPiece.x + ", " + gPiece.y);
+				//console.log("gPiece:" + gPiece.x + ", " + gPiece.y);
+				console.log("path1:" + tpath1[0] + ", path2:" + tpath2[0]);
 				console.log("path1:" + path1[0] + ", path2:" + path2[0]);
 				
 				//create now pathArrs
@@ -441,12 +695,21 @@
 				var bigArea = area1;
 				
 				if (area1>area2) {
-					gArr = newPathArr1;
+					//gArr = newPathArr1;
 				} else {
 					//set new path
-					gArr = newPathArr2;
+					//gArr = newPathArr2;
 					bigArea = area2;
 				}
+				
+				//see which area has enemy inside
+				var point1 = [en1.x,en1.y];
+				if (inside(point1, newPathArr1)) {
+					gArr = newPathArr1;
+				} else {
+					gArr = newPathArr2;
+				}
+				
 				
 				document.getElementById("test").innerHTML = (bigArea/startArea)*100;
 				
@@ -494,17 +757,35 @@
 		
 		ctx.beginPath();
 		
+		ctx.rect(mainOffsetX, mainOffsetY, mainWidth, mainHeight);
 		ctx.fillStyle = pattern1;
+		ctx.fill();
 		
+		
+		//ctx.fillStyle = pattern1;
+		/*ctx.fillStyle = pattern1;
+		ctx.moveTo(mainOffsetX, mainOffsetY);
+		ctx.lineTo(mainOffsetX+mainWidth, mainOffsetY);
+		ctx.lineTo(mainOffsetX+mainWidth, mainOffsetY+mainHeight);
+		ctx.lineTo(mainOffsetX, mainOffsetY+mainHeight);*/
+		
+		//ctx.rect(mainOffsetX, mainOffsetY, mainWidth, mainHeight);
+		
+		//ctx.fill();
+		
+		ctx.beginPath();
+		//ctx.fillStyle = pattern2;
 		ctx.moveTo(gArr[0][0],gArr[0][1]);
 		for (var i = 0; i < gArr.length; i++) {
 			ctx.lineTo(gArr[i][0],gArr[i][1]);
 		}
 		ctx.lineTo(gArr[0][0],gArr[0][1]);
 		ctx.fillStyle = "gray";
+		ctx.fillStyle= 'rgba(0, 0, 0, 0.6)';
+		
 		ctx.fill();
 		
-		
+		ctx.beginPath();
 		ctx.moveTo(gArr[0][0],gArr[0][1]);
 		for (var i = 0; i < gArr.length; i++) {
 			ctx.lineTo(gArr[i][0],gArr[i][1]);
@@ -519,6 +800,9 @@
 		}
 		
 		gPiece.update();
+		en1.update();
+		//en2.update();
+		//en2.draw();
 	}
 	
 	function drawTrace () {
@@ -798,6 +1082,29 @@
 		}
 	  return area/2;
 	}
+	
+	function inside(point, vs) {
+		// ray-casting algorithm based on
+		// http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+
+		var x = point[0], y = point[1];
+
+		var inside = false;
+		for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+			var xi = vs[i][0], yi = vs[i][1];
+			var xj = vs[j][0], yj = vs[j][1];
+
+			var intersect = ((yi > y) != (yj > y))
+				&& (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+			if (intersect) inside = !inside;
+		}
+
+		return inside;
+	};
+	
+	function getRandomIntRange (min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	};
 
 
 
