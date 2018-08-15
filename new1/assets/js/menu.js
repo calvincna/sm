@@ -7,6 +7,10 @@ var Menu = {
 
     create: function () {
 
+		//game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
+    	//game.scale.pageAlignHorizontally = true;
+   		// game.scale.pageAlignVertically = true;
+    
         // Add menu screen.
         // It will act as a button to start the game.
         this.add.button(0, 0, 'menu', this.startGame, this);

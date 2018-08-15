@@ -1,7 +1,20 @@
-var snake, apple, squareSize, score, speed,
+var p1, snake, apple, squareSize, score, speed,
     updateDelay, direction, new_direction,
     addNew, cursors, scoreTextValue, speedTextValue, 
     textStyle_Key, textStyle_Value;
+    
+var mainTop = 0;
+var mainWidth = 300;
+var mainHeight = 400;
+var mainOffsetX = 20;
+var mainOffsetY = 20;
+    
+var gArr = [
+  [mainOffsetX, mainOffsetY],
+  [mainOffsetX + mainWidth, mainOffsetY],
+  [mainOffsetX + mainWidth, mainOffsetY + mainHeight],
+  [mainOffsetX, mainOffsetY + mainHeight]
+];
 
 var Game = {
 
@@ -37,6 +50,9 @@ var Game = {
         for(var i = 0; i < 10; i++){
             snake[i] = game.add.sprite(150+i*squareSize, 150, 'snake');  // Parameters are (X coordinate, Y coordinate, image)
         }
+        
+        p1 = game.add.sprite(20, 20, 'snake');
+        //p1.anchor.setTo(0.5, 0.5);
 
         // Genereate the first apple.
         this.generateApple();
@@ -74,6 +90,8 @@ var Game = {
 		{
 			new_direction = 'down';
 		}
+		
+		
 
 		// A formula to calculate game speed based on the score.
 		// The higher the score, the higher the game speed, with a maximum of 10;
@@ -86,11 +104,18 @@ var Game = {
 
 		// Increase a counter on every update call.
 		updateDelay++;
+		
+		if (updateDelay % (2) == 0) {
+			//user movement
+			p1.x += 15;
+		}
 
 		// Do game stuff only if the counter is aliquot to (10 - the game speed).
 		// The higher the speed, the more frequently this is fulfilled,
 		// making the snake move faster.
 		if (updateDelay % (10 - speed) == 0) {
+		
+			
 
 			// Snake movement
 
