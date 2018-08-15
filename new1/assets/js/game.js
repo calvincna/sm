@@ -105,7 +105,7 @@ var Game = {
 		// Increase a counter on every update call.
 		updateDelay++;
 		
-		if (updateDelay % (4) == 0) {
+		if (updateDelay % (7) == 0) {
 			//user movement
 			p1.x += 5;
 		}
