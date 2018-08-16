@@ -606,9 +606,9 @@
 
         preload: function () {
         
-        	this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-			this.game.scale.pageAlignHorizontally = true;
-			this.game.scale.pageAlignVertically = true;
+        	//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+			//this.game.scale.pageAlignHorizontally = true;
+			//this.game.scale.pageAlignVertically = true;
 
             //  We need this because the assets are on Amazon S3
             //  Remove the next 2 lines if running locally
@@ -676,6 +676,8 @@
            // this.foreground.autoScroll(-60, 0);
 
            // this.weaponName = this.add.bitmapText(8, 364, 'shmupfont', "ENTER = Next Weapon", 24);
+           
+           
 
             //  Cursor keys to fly + space to fire
             this.cursors = this.input.keyboard.createCursorKeys();
@@ -736,6 +738,8 @@
             this.path = [];
 
             var x = 1 / game.width;
+            
+            var prevpt;
 
             for (var i = 0; i <= 1; i += x)
             {
@@ -755,28 +759,41 @@
                     var py = this.math.catmullRomInterpolation(this.points.y, i);
                 }
 
-                this.path.push( { x: px, y: py });
+                //this.path.push( { x: px, y: py });
 
                 this.bmd.rect(px, py, 1, 1, 'rgba(255, 255, 255, 1)');
+                
+                var node = { x: px, y: py, angle: 0 };
+
+				if (i > 0)
+				{
+					node.angle = this.math.angleBetweenPoints(prevpt, node);
+				}
+
+				this.path.push(node);
+				
+				prevpt = node;
             }
 
             for (var p = 0; p < this.points.x.length; p++)
             {
                 this.bmd.rect(this.points.x[p]-3, this.points.y[p]-3, 6, 6, 'rgba(255, 0, 0, 1)');
             }
+            
+           
 
         },
 
         update: function () {
 
-			updateDelay++;
+			//updateDelay++;
             //this.player.body.velocity.set(0);
             
 			//if (updateDelay % (7) == 0) {
 				//user movement
 				 //this.player.body.velocity.x += 5;
 			//}
-			if (updateDelay % (3) == 0) {
+			//if (updateDelay % (3) == 0) {
 			
 			//this.player.body.velocity.x = 5;
 			
@@ -789,9 +806,14 @@
 				{
 					this.pi = 0;
 				}
-			}
+				this.player.rotation = this.path[this.pi].angle;
+			//}
             
-           
+           if (game.input.activePointer.isDown)
+    {
+        this.weapons[this.currentWeapon].fire(this.player);
+    }
+
 
             if (this.cursors.left.isDown)
             {
@@ -815,6 +837,7 @@
             {
                 this.weapons[this.currentWeapon].fire(this.player);
             }
+            
 
         }
 
