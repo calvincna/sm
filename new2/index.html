@@ -21,6 +21,9 @@
 	var mainOffsetX = 20;
 	var mainOffsetY = 20;
 	
+	var gStep = 0;
+	var gDir = "left";
+	
 	var mainWidth = canvasWidth - (mainOffsetX*2);
 	var mainHeight = canvasHeight - (mainOffsetY*2);
 	
@@ -654,7 +657,7 @@
                 this.weapons[i].visible = false;
             }
 
-            this.player = this.add.sprite(64, 200, 'player');
+            this.player = this.add.sprite(mainOffsetX, mainOffsetY, 'player');
 
             this.physics.arcade.enable(this.player);
 
@@ -786,7 +789,7 @@
 
         update: function () {
 
-			//updateDelay++;
+			updateDelay++;
             //this.player.body.velocity.set(0);
             
 			//if (updateDelay % (7) == 0) {
@@ -797,7 +800,7 @@
 			
 			//this.player.body.velocity.x = 5;
 			
-				this.player.x = this.path[this.pi].x;
+				/*this.player.x = this.path[this.pi].x;
 				this.player.y = this.path[this.pi].y;
 
 				this.pi++;
@@ -807,12 +810,82 @@
 					this.pi = 0;
 				}
 				this.player.rotation = this.path[this.pi].angle;
+				console.log(this.player.rotation);*/
 			//}
+			
+			//if (updateDelay % (3) == 0) {
+			
+				// if reached position, proceed to next point
+				/*if ((this.player.x==gArr[gStep][0])&&(this.player.y==gArr[gStep][1])) {
+					if (gStep +1 >= gArr.length) {
+						gStep = 0;
+					} else {
+						this.player.x = gArr[gStep][0];
+						this.player.y = gArr[gStep][1];
+						gStep++;
+					}
+			
+				}*/
+				
+				this.player.anchor.set(0.5);
+			
+				var getDirNow = getStep (this.player.x ,this.player.y);
+				
+				if (getDirNow[1] == "up") {
+					this.player.y -= 5;
+					if (this.player.y<=gArr[gStep][1]) {
+						this.player.y = gArr[gStep][1];
+						gStep++;
+						if (gStep >= gArr.length) {
+							gStep = 0;
+						}
+					}
+					
+					
+				} else if (getDirNow[1] == "down") {
+					this.player.y += 5;
+					
+					if (this.player.y>=gArr[gStep][1]) {
+						this.player.y = gArr[gStep][1];
+						gStep++;
+						if (gStep >= gArr.length) {
+							gStep = 0;
+						}
+					}
+				}  else if (getDirNow[1] == "left") {
+					this.player.x -= 5;
+					
+					if (this.player.x<=gArr[gStep][0]) {
+						this.player.x = gArr[gStep][0];
+						gStep++;
+						if (gStep >= gArr.length) {
+							gStep = 0;
+						}
+					}
+				}  else if (getDirNow[1] == "right") {
+					
+					this.player.x += 5;
+					
+					if (this.player.x>=gArr[gStep][0]) {
+						//alert("re");
+						this.player.x = gArr[gStep][0];
+						gStep++;
+						if (gStep >= gArr.length) {
+							gStep = 0;
+						}
+						//alert(gStep + "::" + );
+					}
+					
+				}
+				
+				this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
+			//}
+			
             
-           if (game.input.activePointer.isDown)
-    {
-        this.weapons[this.currentWeapon].fire(this.player);
-    }
+           	if (game.input.activePointer.isDown)
+			{
+				this.weapons[this.currentWeapon].fire(this.player);
+			}
 
 
             if (this.cursors.left.isDown)
@@ -844,6 +917,115 @@
     };
 
     game.state.add('Game', PhaserGame, true);
+    
+    function getStep(xIn, yIn) {
+	
+		//https://stackoverflow.com/questions/36523507/detection-and-response-ball-to-wall-collision-inside-any-polygon
+
+		//console.log("checkstep start");
+	
+		var dirNow= -1;
+		//find out which step the point touches
+		var stepNow = -1;
+		//alert(stepNow);
+		for (var i = 0; i < gArr.length; i++) {
+		
+			var pasti = i-1;
+			if (i-1<0) {
+				pasti=gArr.length-1;
+			}
+			
+			var na1;
+			var na2;
+		
+			//check x same or y same as prev point
+			if (gArr[pasti][0]==gArr[i][0]) {
+				//console.log("step with same X:" + gArr[pasti][0] );
+				
+				if (xIn==gArr[pasti][0]) {
+					//console.log("gpiece with same X:" + xIn );
+					
+						na1 = gArr[i][1]; //higher - smaller
+						na2 = gArr[pasti][1]; //lower - bigger
+				
+						if (gArr[pasti][1]>gArr[i][1]) {
+							//na1 = gArr[i][1]; //higher - smaller
+							//na2 = gArr[pasti][1]; //lower - bigger
+							
+							dirNow = "up";
+							
+							//includes last point on the line
+							if (yIn>na1 && yIn<=na2) {
+								stepNow = i;
+								//console.log("match type up:" + i);
+							} 
+						
+						} else {
+							
+							//na1 = gArr[i][1]; //lower - bigger
+							//na2 = gArr[pasti][1]; //higher - smaller
+							
+							dirNow = "down";
+							
+							if (yIn>=na2 && yIn<na1) {
+								stepNow = i;
+								//console.log("match type down:" + i);
+							}
+						}
+						
+						//console.log("y na1="+na1);
+						//console.log("y na2="+na2);
+					
+				} else {
+					//console.log("gpiece not with same X:" + xIn );
+				}
+			
+			} else {
+				//console.log("step with same Y" + gArr[pasti][1] + "," +  + gArr[i][1] );
+			
+				if (yIn==gArr[pasti][1]) {
+					//console.log("gpiece with same Y:" + yIn );
+					
+					na1 = gArr[i][0];
+					na2 = gArr[pasti][0];
+			
+						if (gArr[pasti][0]>gArr[i][0]) {
+							//na1 = gArr[i][0];
+							//na2 = gArr[pasti][0];
+							
+							dirNow = "left";
+							
+							if (xIn>na1 && xIn<=na2) {
+								stepNow = i;
+							}
+					
+						} else {
+							//na1 = gArr[i][0];
+							//na2 = gArr[pasti][0];
+							
+							dirNow = "right";
+							
+							if (xIn<na1 && xIn>=na2) {
+								stepNow = i;
+							}
+						}
+						
+						//console.log("x na1="+na1);
+						//console.log("x na2="+na2);
+					
+						
+				} else {
+					//console.log("gpiece not with same Y:" + yIn );
+				}
+				
+			}
+		}
+		
+		var stepNowArr = [stepNow, dirNow];
+		
+		return stepNowArr;
+	
+	}
 
     </script>
 
