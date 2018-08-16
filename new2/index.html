@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Bullet Pool</title>
+    <title>OP1</title>
     <meta charset="utf-8">
     <script src="phaser.min.js"></script>
 </head>
@@ -13,7 +13,25 @@
     
     var updateDelay = 0;
 
-    var game = new Phaser.Game(640, 400, Phaser.AUTO, 'game');
+	var mainTop = 0;
+	
+	var canvasWidth = 400;
+	var canvasHeight = 640;
+
+	var mainOffsetX = 20;
+	var mainOffsetY = 20;
+	
+	var mainWidth = canvasWidth - (mainOffsetX*2);
+	var mainHeight = canvasHeight - (mainOffsetY*2);
+	
+	var gArr = [
+	  [mainOffsetX, mainOffsetY],
+	  [mainWidth, mainOffsetY],
+	  [mainWidth, mainHeight],
+	  [mainOffsetX, mainHeight]
+	];
+
+    var game = new Phaser.Game(canvasWidth, canvasHeight, Phaser.AUTO, 'game');
 
     //  Our core Bullet class
     //  This is a simple Sprite object that we set a few properties on
@@ -548,11 +566,31 @@
 
         this.player = null;
         this.cursors = null;
-        this.speed = 300;
+        this.speed = 10;
 
         this.weapons = [];
         this.currentWeapon = 0;
         this.weaponName = null;
+        
+        this.mode = 0;
+        
+        var xPoints = [];
+        var yPoints = [];
+         
+		for (var i = 0; i < gArr.length; i++) {
+			xPoints.push(gArr[i][0]);
+			yPoints.push(gArr[i][1]);
+		}
+		xPoints.push(gArr[0][0]);
+		yPoints.push(gArr[0][1]);
+
+		this.points = {
+			'x': xPoints,
+			'y': yPoints
+		};
+
+        this.pi = 0;
+        this.path = [];
 
     };
 
@@ -589,8 +627,8 @@
 
         create: function () {
 
-            this.background = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
-            this.background.autoScroll(-40, 0);
+            //this.background = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
+           // this.background.autoScroll(-40, 0);
 
             this.weapons.push(new Weapon.SingleBullet(this.game));
             this.weapons.push(new Weapon.FrontAndBack(this.game));
@@ -617,11 +655,23 @@
             this.physics.arcade.enable(this.player);
 
             this.player.body.collideWorldBounds = true;
+            
+            this.bmd = this.add.bitmapData(this.game.width, this.game.height);
+			this.bmd.addToWorld();
 
-            this.foreground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'foreground');
-            this.foreground.autoScroll(-60, 0);
+			/*var py = this.points.y;
 
-            this.weaponName = this.add.bitmapText(8, 364, 'shmupfont', "ENTER = Next Weapon", 24);
+			for (var i = 0; i < py.length; i++)
+			{
+				py[i] = this.rnd.between(32, 432);
+			}*/
+
+			this.plot();
+
+            //this.foreground = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'foreground');
+           // this.foreground.autoScroll(-60, 0);
+
+           // this.weaponName = this.add.bitmapText(8, 364, 'shmupfont', "ENTER = Next Weapon", 24);
 
             //  Cursor keys to fly + space to fire
             this.cursors = this.input.keyboard.createCursorKeys();
@@ -660,16 +710,82 @@
             this.weaponName.text = this.weapons[this.currentWeapon].name;
 
         },
+        plot: function () {
+        
+        	xPoints = [];
+       		yPoints = [];
+         
+			for (var i = 0; i < gArr.length; i++) {
+				xPoints.push(gArr[i][0]);
+				yPoints.push(gArr[i][1]);
+			}
+			xPoints.push(gArr[0][0]);
+			yPoints.push(gArr[0][1]);
+
+			this.points = {
+				'x': xPoints,
+				'y': yPoints
+			};
+
+            this.bmd.clear();
+
+            this.path = [];
+
+            var x = 1 / game.width;
+
+            for (var i = 0; i <= 1; i += x)
+            {
+                if (this.mode === 0)
+                {
+                    var px = this.math.linearInterpolation(this.points.x, i);
+                    var py = this.math.linearInterpolation(this.points.y, i);
+                }
+                else if (this.mode === 1)
+                {
+                    var px = this.math.bezierInterpolation(this.points.x, i);
+                    var py = this.math.bezierInterpolation(this.points.y, i);
+                }
+                else if (this.mode === 2)
+                {
+                    var px = this.math.catmullRomInterpolation(this.points.x, i);
+                    var py = this.math.catmullRomInterpolation(this.points.y, i);
+                }
+
+                this.path.push( { x: px, y: py });
+
+                this.bmd.rect(px, py, 1, 1, 'rgba(255, 255, 255, 1)');
+            }
+
+            for (var p = 0; p < this.points.x.length; p++)
+            {
+                this.bmd.rect(this.points.x[p]-3, this.points.y[p]-3, 6, 6, 'rgba(255, 0, 0, 1)');
+            }
+
+        },
 
         update: function () {
 
 			updateDelay++;
             //this.player.body.velocity.set(0);
             
-			if (updateDelay % (7) == 0) {
+			//if (updateDelay % (7) == 0) {
 				//user movement
-				 this.player.body.velocity.x += this.speed;
-			}
+				 //this.player.body.velocity.x += 5;
+			//}
+			//if (updateDelay % (3) == 0) {
+			
+			//this.player.body.velocity.x = 5;
+			
+				this.player.x = this.path[this.pi].x;
+				this.player.y = this.path[this.pi].y;
+
+				this.pi++;
+
+				if (this.pi >= this.path.length)
+				{
+					this.pi = 0;
+				}
+			//}
             
            
 
