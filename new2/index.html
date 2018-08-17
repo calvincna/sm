@@ -590,6 +590,7 @@
         this.weaponName = null;
         
         this.mode = 0;
+        this.turn = "down";
         
         var xPoints = [];
         var yPoints = [];
@@ -623,9 +624,9 @@
 
         preload: function () {
         
-        	//this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-			//this.game.scale.pageAlignHorizontally = true;
-			//this.game.scale.pageAlignVertically = true;
+        	/*this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+			this.game.scale.pageAlignHorizontally = true;
+			this.game.scale.pageAlignVertically = true;*/
 
             //  We need this because the assets are on Amazon S3
             //  Remove the next 2 lines if running locally
@@ -722,7 +723,7 @@
 
            // this.weaponName = this.add.bitmapText(8, 364, 'shmupfont', "ENTER = Next Weapon", 24);
            
-           
+           game.input.onDown.add(this.gTap, this);
 
             //  Cursor keys to fly + space to fire
             this.cursors = this.input.keyboard.createCursorKeys();
@@ -733,6 +734,59 @@
             changeKey.onDown.add(this.nextWeapon, this);
 
         },
+        
+        gTap: function(pointer) {
+				//this.weapons[this.currentWeapon].fire(this.player);
+				
+				if (this.mode === 0)
+                {
+					var getDirNow = getStep (this.player.x ,this.player.y);
+					//console.log(this.player.x + "::" + this.player.y + "::" + getDirNow[0] + "::" + getDirNow[1]);
+				
+				
+				
+				
+					if (getDirNow[1] == "up") {
+						this.mode ="right";
+					
+					} else if (getDirNow[1] == "down") {
+						this.mode ="left";
+					
+					}  else if (getDirNow[1] == "left") {
+						this.mode ="up";
+					
+					}  else if (getDirNow[1] == "right") {
+						this.mode ="down";
+					}
+				
+					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
+				
+				} else if (this.mode == "down") {
+					this.mode = this.turn;
+					this.turn = "up";
+					this.player.angle = 270;
+					//var posArr = [gPiece.x,gPiece.y];
+					//trace.push(posArr);
+				} else if (this.mode == "up") {
+					this.mode = this.turn;
+					this.turn = "up";
+					this.player.angle = 270;
+					//var posArr = [gPiece.x,gPiece.y];
+					//trace.push(posArr);
+				} else if (this.mode == "left") {
+					this.mode = this.turn;
+					this.turn = "left";
+					this.player.angle = 180;
+					//var posArr = [gPiece.x,gPiece.y];
+					//trace.push(posArr);
+				} else if (this.mode == "right") {
+					this.mode = this.turn;
+					this.turn = "left";
+					this.player.angle = 180;
+					//var posArr = [gPiece.x,gPiece.y];
+					//trace.push(posArr);
+				}
+			},
 
         nextWeapon: function () {
 
@@ -870,6 +924,48 @@
 				}*/
 				
 				this.player.anchor.set(0.5);
+				
+				
+				if (updateDelay % (55) == 0) {
+					if (this.mode=="down") {
+						if (this.turn == "left") {
+							this.turn = "right";
+							this.player.angle = 0;
+						} else {
+							this.turn = "left";
+							this.player.angle = 180;
+						}
+					} else if (this.mode=="up") {
+						if (this.turn == "left") {
+							this.turn = "right";
+							this.player.angle = 0;
+						} else {
+							this.turn = "left";
+							this.player.angle = 180;
+						}
+					} else if (this.mode=="left") {
+						if (this.turn == "up") {
+							this.turn = "down";
+							this.player.angle = 90;
+						} else {
+							this.turn = "up";
+							this.player.angle = 270;
+						}
+					} else if (this.mode=="right") {
+						if (this.turn == "up") {
+							this.turn = "down";
+							this.player.angle = 90;
+							
+						} else {
+							this.turn = "up";
+							this.player.angle = 270;
+						}
+				
+					}
+		
+				}
+				
+				
 			
 				if (this.mode === 0)
 				{
@@ -915,54 +1011,58 @@
 			
 					//if gMode is 1 and position not on wall advance in direction
 					//if gMode is 1 and position touched wall, change mode to 0
+					
+					var preX = this.player.x;
+					var preY = this.player.y;
 		
 					if (this.mode === "down") {
-						this.player.y++;
+						this.player.y += 2;
 				
 					} else if (this.mode === "up") {
-						this.player.y--;
+						this.player.y -= 2;
 				
 					} else if (this.mode === "left") {
-						this.player.x--;
+						this.player.x -= 2;
 				
 					} else if (this.mode === "right") {
-						this.player.x++;
+						this.player.x += 2;
 				
 					}
+					//check all paths, if touch wall, park on border line and change mode
+					if (!gPoly.contains(this.player.x, this.player.y)) {
+						//alert("out");
+						var intFlag = -1;
+						var line1 = new Phaser.Line(preX, preY, this.player.x, this.player.y);
+						for (var i = 0; i < gArr.length; i++) {
+						
+							var pasti = i-1;
+							if (i-1<0) {
+								pasti=gArr.length-1;
+							}
+							
+							var line2 = new Phaser.Line(gArr[pasti][0], gArr[pasti][1], gArr[i][0], gArr[i][1]);
+							
+							p = line1.intersects(line2, true);
+
+							if (p)
+							{
+								intFlag = i;
+								this.mode = 0;
+								this.player.x = p.x;
+								this.player.y = p.y;
+							} else
+							{
+								
+							}
+						}
+					}
 				}
-			//}
+			
 			
 			
             
-           	if (game.input.activePointer.isDown)
-			{
-				//this.weapons[this.currentWeapon].fire(this.player);
-				
-				if (this.mode === 0)
-                {
-					var getDirNow = getStep (this.player.x ,this.player.y);
-					//console.log(this.player.x + "::" + this.player.y + "::" + getDirNow[0] + "::" + getDirNow[1]);
-				
-				
-				
-				
-					if (getDirNow[1] == "up") {
-						this.mode ="right";
-					
-					} else if (getDirNow[1] == "down") {
-						this.mode ="left";
-					
-					}  else if (getDirNow[1] == "left") {
-						this.mode ="up";
-					
-					}  else if (getDirNow[1] == "right") {
-						this.mode ="down";
-					}
-				
-					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
-				
-				}
-			}
+           //	if (game.input.activePointer.isDown)
+			//{}
 
 
             if (this.cursors.left.isDown)
@@ -994,6 +1094,8 @@
     };
 
     game.state.add('Game', PhaserGame, true);
+    
+
     
     function getStep(xIn, yIn) {
 	
