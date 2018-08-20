@@ -1143,7 +1143,7 @@
 				
 				//this.game.physics.arcade.overlap(this.traces, this.traces, this.traceOverlap, null, this);   
 				//this.game.physics.arcade.overlap(this.traces, this.player, this.traceOverlap, null, this);   
-				this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
+				//this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
            
 				
 				
@@ -1398,6 +1398,12 @@
 								gPoly = new Phaser.Polygon(polyPoints);
 								
 								if (gPoly.contains(this.en1.x, this.en1.y)) {
+								
+									var graphics2 =game.add.graphics(0,0);
+									graphics2.lineStyle(2, 0xffdd00, 1);
+									graphics2.moveTo(this.en1.x, this.en1.y);
+									graphics2.lineTo(this.en1.x+1, this.en1.y+1);
+									graphics2.endFill();
 								
 									gArr = [];
 								
