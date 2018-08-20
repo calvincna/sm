@@ -812,7 +812,7 @@
 					
 					//if not enough don't turn
 					
-					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin) {
+					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin)) {
 					
 					
 						this.mode = this.turn;
@@ -822,7 +822,7 @@
 						trace.push(posArr);
 					}
 				} else if (this.mode == "up") {
-					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin) {
+					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin)) {
 						this.mode = this.turn;
 						this.turn = "up";
 						this.player.angle = 270;
@@ -830,7 +830,7 @@
 						trace.push(posArr);
 					}
 				} else if (this.mode == "left") {
-					if (Math.abs(trace[trace.length-1][0]-this.player.x>turnMin) {
+					if (Math.abs(trace[trace.length-1][0]-this.player.x>turnMin)) {
 						this.mode = this.turn;
 						this.turn = "left";
 						this.player.angle = 180;
@@ -838,13 +838,14 @@
 						trace.push(posArr);
 					}
 				} else if (this.mode == "right") {
-					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin) {
+					if (Math.abs(trace[trace.length-1][0]-this.player.x>turnMin)) {
 						this.mode = this.turn;
 						this.turn = "left";
 						this.player.angle = 180;
 						var posArr = [this.player.x,this.player.y];
 						trace.push(posArr);
 					}
+					
 				}
 			},
 
