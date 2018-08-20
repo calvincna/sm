@@ -775,6 +775,8 @@
         gTap: function(pointer) {
 				//this.weapons[this.currentWeapon].fire(this.player);
 				
+				var turnMin = 5;
+				
 				if (this.mode === 0)
                 {
 					var getDirNow = getStep (this.player.x ,this.player.y);
@@ -807,12 +809,11 @@
 					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
 				
 				} else if (this.mode == "down") {
-				
-					var turnMin = 10;
-					
-					//if not enough don't turn
-					
-					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin)) {
+					/*alert("1::" + trace[trace.length-1][0] + ", " +trace[trace.length-1][1]);
+					alert("2::" + this.player.x + ", " + this.player.y);
+					alert("3::" + trace[trace.length-1][1] + ", " + this.player.y);
+					alert("4::" + (Number(trace[trace.length-1][1])-Number(this.player.y)));*/
+					if (Math.abs(trace[trace.length-1][1]-this.player.y)>turnMin) {
 					
 					
 						this.mode = this.turn;
@@ -822,7 +823,7 @@
 						trace.push(posArr);
 					}
 				} else if (this.mode == "up") {
-					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin)) {
+					if (Math.abs(trace[trace.length-1][1]-this.player.y)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "up";
 						this.player.angle = 270;
@@ -830,7 +831,7 @@
 						trace.push(posArr);
 					}
 				} else if (this.mode == "left") {
-					if (Math.abs(trace[trace.length-1][0]-this.player.x>turnMin)) {
+					if (Math.abs(trace[trace.length-1][0]-this.player.x)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "left";
 						this.player.angle = 180;
@@ -838,7 +839,7 @@
 						trace.push(posArr);
 					}
 				} else if (this.mode == "right") {
-					if (Math.abs(trace[trace.length-1][0]-this.player.x>turnMin)) {
+					if (Math.abs(trace[trace.length-1][0]-this.player.x)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "left";
 						this.player.angle = 180;
