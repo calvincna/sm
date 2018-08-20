@@ -38,7 +38,7 @@
 	var en1SpdX = 26;
 	var en1SpdY = 26;
 	
-	var trace = [];
+	var traceArr = [];
 	
 	var gArr = [
 	  [mainOffsetX, mainOffsetY],
@@ -657,6 +657,7 @@
             this.load.spritesheet('en1', 'assets/en1.png');
             this.load.bitmapFont('shmupfont', 'assets/shmupfont.png', 'assets/shmupfont.xml');
             this.load.image('wall', 'assets/back.png');
+            this.load.image('trace', 'assets/bullet11.png');
 
             for (var i = 1; i <= 11; i++)
             {
@@ -705,6 +706,7 @@
             this.en1 =  this.add.sprite(22, 618, 'en1');
             
             this.walls = this.game.add.group();
+            this.traces = this.game.add.group();
             
 
             this.physics.arcade.enable(this.player);
@@ -782,69 +784,74 @@
 					var getDirNow = getStep (this.player.x ,this.player.y);
 					//console.log(this.player.x + "::" + this.player.y + "::" + getDirNow[0] + "::" + getDirNow[1]);
 				
-				
-				
+			
 				
 					if (getDirNow[1] == "up") {
 						this.mode ="right";
+						this.turn = "up";
+						this.player.angle = 270;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					
 					} else if (getDirNow[1] == "down") {
 						this.mode ="left";
+						this.turn = "up";
+						this.player.angle = 270;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					
 					}  else if (getDirNow[1] == "left") {
 						this.mode ="up";
+						this.turn = "left";
+						this.player.angle = 180;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					
 					}  else if (getDirNow[1] == "right") {
 						this.mode ="down";
+						this.turn = "left";
+						this.player.angle = 180;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					}
 				
 					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
 				
 				} else if (this.mode == "down") {
-					/*alert("1::" + trace[trace.length-1][0] + ", " +trace[trace.length-1][1]);
+					/*alert("1::" + traceArr[traceArr.length-1][0] + ", " +traceArr[traceArr.length-1][1]);
 					alert("2::" + this.player.x + ", " + this.player.y);
-					alert("3::" + trace[trace.length-1][1] + ", " + this.player.y);
-					alert("4::" + (Number(trace[trace.length-1][1])-Number(this.player.y)));*/
-					if (Math.abs(trace[trace.length-1][1]-this.player.y)>turnMin) {
-					
-					
+					alert("3::" + traceArr[traceArr.length-1][1] + ", " + this.player.y);
+					alert("4::" + (Number(traceArr[traceArr.length-1][1])-Number(this.player.y)));*/
+					if (Math.abs(traceArr[traceArr.length-1][1]-this.player.y)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "up";
 						this.player.angle = 270;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					}
 				} else if (this.mode == "up") {
-					if (Math.abs(trace[trace.length-1][1]-this.player.y)>turnMin) {
+					if (Math.abs(traceArr[traceArr.length-1][1]-this.player.y)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "up";
 						this.player.angle = 270;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					}
 				} else if (this.mode == "left") {
-					if (Math.abs(trace[trace.length-1][0]-this.player.x)>turnMin) {
+					if (Math.abs(traceArr[traceArr.length-1][0]-this.player.x)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "left";
 						this.player.angle = 180;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					}
 				} else if (this.mode == "right") {
-					if (Math.abs(trace[trace.length-1][0]-this.player.x)>turnMin) {
+					if (Math.abs(traceArr[traceArr.length-1][0]-this.player.x)>turnMin) {
 						this.mode = this.turn;
 						this.turn = "left";
 						this.player.angle = 180;
 						var posArr = [this.player.x,this.player.y];
-						trace.push(posArr);
+						traceArr.push(posArr);
 					}
 					
 				}
@@ -944,16 +951,16 @@
            
 
         },
-        drawTrace: function () {
-			//draw out path from trace
-			if (trace.length>0) {
+        drawtraceArr: function () {
+			//draw out path from traceArr
+			if (traceArr.length>0) {
 				/*
 				ctx = gArea.context;
 				ctx.beginPath();
-				ctx.moveTo(trace[0][0],trace[0][1]);
-				for (var i = 0; i < trace.length; i++) {
+				ctx.moveTo(traceArr[0][0],traceArr[0][1]);
+				for (var i = 0; i < traceArr.length; i++) {
 			
-					ctx.lineTo(trace[i][0],trace[i][1]);
+					ctx.lineTo(traceArr[i][0],traceArr[i][1]);
 				}
 				ctx.lineTo(gPiece.x,gPiece.y);
 
@@ -963,11 +970,11 @@
 				
 				
 				graphicsLine.lineStyle(2, 0xffd900, 1);
-				graphicsLine.moveTo(trace[0][0],trace[0][1]);
+				graphicsLine.moveTo(traceArr[0][0],traceArr[0][1]);
 				
-				for (var i = 1; i < trace.length; i++) {
+				for (var i = 1; i < traceArr.length; i++) {
 			
-					 graphicsLine.lineTo(trace[i][0],trace[i][1]);
+					 graphicsLine.lineTo(traceArr[i][0],traceArr[i][1]);
 				}
 				graphicsLine.lineTo(this.player.x,this.player.y);
 				graphicsLine.endFill();
@@ -1044,7 +1051,7 @@
 				
 				this.walls.removeAll(true);
 				
-				var collSize = 3;
+				var collSize = 1;
 				
 				//create rectangle sprites for all the paths
 				for (var i = 0; i < gArr.length; i++)
@@ -1060,7 +1067,7 @@
 					if (gArr[i][0] - gArr[pasti][0]==0) {
 						if (gArr[i][1]<gArr[pasti][1]) {
 							//up
-							startY = gArr[i][1];
+							//startY = gArr[i][1];
 						} else {
 							//down
 							startY = gArr[pasti][1];
@@ -1072,7 +1079,7 @@
 							startX = gArr[pasti][0];
 						} else {
 							//left
-							startX = gArr[i][0];
+							//startX = gArr[i][0];
 						}
 					}
 					var wall1 =  this.add.sprite(startX, startY, 'wall');
@@ -1087,6 +1094,89 @@
 				
 				
 				}
+				
+				this.traces.removeAll(true);
+				
+				//create rectangle sprites for the trace
+				if (traceArr.length>1) {
+				
+				
+					for (var i = 1; i < traceArr.length; i++)
+					{
+						
+						//which position to use as start point?
+						var startX = traceArr[i][0];
+						var startY = traceArr[i][1];
+						//if horizontal path
+						if (traceArr[i][0] - traceArr[i-1][0]==0) {
+							if (traceArr[i][1]<traceArr[i-1][1]) {
+								//up
+								//startY = traceArr[i][1];
+							} else {
+								//down
+								startY = traceArr[i-1][1];
+							}
+						} else {
+						//vertical
+							if (traceArr[i][0]>traceArr[i-1][0]) {
+								//right
+								startX = traceArr[i-1][0];
+							} else {
+								//left
+								//startX = traceArr[i][0];
+							}
+						}
+					
+						var wall1 =  this.add.sprite(startX, startY, 'trace');
+					
+					
+						wall1.width = Math.max(Math.abs(traceArr[i][0] - traceArr[i-1][0]),collSize);
+						wall1.height = Math.max(Math.abs(traceArr[i][1] - traceArr[i-1][1]),collSize);
+						this.physics.arcade.enable(wall1);
+						wall1.body.immovable = true;
+			
+						this.traces.add(wall1);
+					}
+				
+				}
+				
+				//mark final wall
+				if (traceArr.length>0) {
+					//which position to use as start point?
+					var startX = this.player.x;
+					var startY = this.player.y;
+					//if horizontal path
+					if (this.player.x - traceArr[traceArr.length-1][0]==0) {
+						if (this.player.y<traceArr[traceArr.length-1][1]) {
+							//up
+							//startY = traceArr[i][1];
+						} else {
+							//down
+							startY = traceArr[traceArr.length-1][1];
+						}
+					} else {
+					//vertical
+						if (this.player.x>traceArr[traceArr.length-1][0]) {
+							//right
+							startX = traceArr[traceArr.length-1][0];
+						} else {
+							//left
+							//startX = traceArr[i][0];
+						}
+					}
+				
+					var wall1 =  this.add.sprite(startX, startY, 'trace');
+				
+				
+					wall1.width = Math.max(Math.abs(this.player.x - traceArr[traceArr.length-1][0]),collSize);
+					wall1.height = Math.max(Math.abs(this.player.y - traceArr[traceArr.length-1][1]),collSize);
+					this.physics.arcade.enable(wall1);
+					wall1.body.immovable = true;
+		
+					this.traces.add(wall1);
+				}
+				
+				
 				           
            
 				
@@ -1205,22 +1295,22 @@
 		
 					if (this.mode === "down") {
 						this.player.y += pSpd2;
-						this.drawTrace();
+						this.drawtraceArr();
 					} else if (this.mode === "up") {
 						this.player.y -= pSpd2;
-						this.drawTrace();
+						this.drawtraceArr();
 					} else if (this.mode === "left") {
 						this.player.x -= pSpd2;
-						this.drawTrace();
+						this.drawtraceArr();
 					} else if (this.mode === "right") {
 						this.player.x += pSpd2;
-						this.drawTrace();
+						this.drawtraceArr();
 					}
 					//check all paths, if touch wall, park on border line and change mode
 					if (!gPoly.contains(this.player.x, this.player.y)) {
 						//alert("out");
-						//trace=[];
-						//this.drawTrace();
+						//traceArr=[];
+						//this.drawtraceArr();
 								
 						var intFlag = -1;
 						line1 = new Phaser.Line(preX, preY, this.player.x, this.player.y);
@@ -1240,19 +1330,19 @@
 								this.mode = 0;
 								this.player.x = p.x;
 								this.player.y = p.y;
-								//console.log(trace);
+								//console.log(traceArr);
 								
 								//enter final insertion position 
 								var posArr = [this.player.x,this.player.y];
-								trace.push(posArr);
+								traceArr.push(posArr);
 								
 								//divide into 2 polygons and check size
 								
 								//get origin insertion point 1 path
-								var tpath1 = getStep(trace[0][0],trace[0][1]);
+								var tpath1 = getStep(traceArr[0][0],traceArr[0][1]);
 				
 								//get final insertion point 2 path
-								var tpath2 = getStep(trace[trace.length-1][0],trace[trace.length-1][1]);
+								var tpath2 = getStep(traceArr[traceArr.length-1][0],traceArr[traceArr.length-1][1]);
 				
 								var path1;
 								var path2;
@@ -1265,7 +1355,7 @@
 								} else if (tpath2[0]<tpath1[0]) {
 									path1 = tpath2;
 									path2 = tpath1;
-									trace = trace.reverse();
+									traceArr = traceArr.reverse();
 					
 					
 								} else if (tpath2[0]==tpath1[0]) {
@@ -1277,21 +1367,21 @@
 					
 									//check path which is nearer to path point
 									if (path1[1]=="up") {
-										if (trace[0][1] < trace[trace.length-1][1]) {
-											trace = trace.reverse();
+										if (traceArr[0][1] < traceArr[traceArr.length-1][1]) {
+											traceArr = traceArr.reverse();
 										}
 									} else if (path1[1]=="down") {
-										if (trace[0][1] > trace[trace.length-1][1]) {
-											trace = trace.reverse();
+										if (traceArr[0][1] > traceArr[traceArr.length-1][1]) {
+											traceArr = traceArr.reverse();
 										}
 									} else if (path1[1]=="left") {
-										if (trace[0][0] < trace[trace.length-1][0]) {
-											trace = trace.reverse();
+										if (traceArr[0][0] < traceArr[traceArr.length-1][0]) {
+											traceArr = traceArr.reverse();
 										}
 									} else if (path1[1]=="right") {
-										//alert(trace[0][1] + ":::" + trace[trace.length-1][1]);
-										if (trace[0][0] > trace[trace.length-1][0]) {
-											trace = trace.reverse();
+										//alert(traceArr[0][1] + ":::" + traceArr[traceArr.length-1][1]);
+										if (traceArr[0][0] > traceArr[traceArr.length-1][0]) {
+											traceArr = traceArr.reverse();
 										}
 									}
 								}
@@ -1306,9 +1396,9 @@
 								for (var i = 0; i < path1[0]; i++) {
 									newPathArr1.push (gArr[i]);
 								}
-								//insert trace path
-								for (var i = 0; i < trace.length; i++) {
-									newPathArr1.push (trace[i]);
+								//insert traceArr path
+								for (var i = 0; i < traceArr.length; i++) {
+									newPathArr1.push (traceArr[i]);
 								}
 								//insert paths after insertion point 2
 								for (var i = path2[0]; i < gArr.length; i++) {
@@ -1316,18 +1406,18 @@
 								}
 				
 								//create path array 2
-								trace = trace.reverse();
+								traceArr = traceArr.reverse();
 				
 								for (var i = (path1[0]); i < (path2[0]); i++) {
 									newPathArr2.push (gArr[i]);
 								}
-								//insert trace path
-								for (var i = 0; i < trace.length; i++) {
-									newPathArr2.push (trace[i]);
+								//insert traceArr path
+								for (var i = 0; i < traceArr.length; i++) {
+									newPathArr2.push (traceArr[i]);
 								}
 								
-								console.log(newPathArr1);
-								console.log(newPathArr2);
+								//console.log(newPathArr1);
+								//console.log(newPathArr2);
 								
 								
 								 
@@ -1423,8 +1513,8 @@
 								
 								
 								
-								trace = [];
-								this.drawTrace();
+								traceArr = [];
+								this.drawtraceArr();
 								
 								
 								
@@ -1466,6 +1556,7 @@
                 this.weapons[this.currentWeapon].fire(this.player);
             }
             game.world.bringToTop(this.walls);
+            game.world.bringToTop(this.traces);
 			game.world.bringToTop(this.player);
         }
 
