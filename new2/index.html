@@ -18,8 +18,8 @@
 	var canvasWidth = 400;
 	var canvasHeight = 640;
 
-	var mainOffsetX = 40;
-	var mainOffsetY = 40;
+	var mainOffsetX = 20;
+	var mainOffsetY = 20;
 	
 	var gStep = 0;
 	var gDir = "left";
@@ -29,13 +29,29 @@
 	
 	var gPoly;
 	var graphics;
+	var graphicsLine;
+	var line1;
+	var line2;
 	
-	var gArr = [
+	var en1prevx;
+	var en1prevy;
+	var en1SpdX = 26;
+	var en1SpdY = 26;
+	
+	var trace = [];
+	
+	/*var gArr = [
 	  [mainOffsetX, mainOffsetY],
 	  [mainWidth, mainOffsetY],
 	  [mainWidth, mainHeight],
 	  [mainOffsetX, mainHeight]
-	];
+	];*/
+	
+	
+	var gArr = [[20, 20],[380, 20],[380, 285],[261, 285],[261, 351],[380, 351],[380, 620],[20, 620]];
+	
+	//var gArr = [[20, 20],[380, 20],[380, 145],[292, 145],[292, 310],[380, 310],[380, 620],[20, 620]];
+	//var gArr = [[20, 20],[380, 20],[380, 270],[263, 270],[263, 437],[380, 437],[380, 620],[20, 620]];
 	/*
 	var gArr = [
 	  [40, 40],
@@ -624,9 +640,11 @@
 
         preload: function () {
         
-        	this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-			this.game.scale.pageAlignHorizontally = true;
-			this.game.scale.pageAlignVertically = true;
+        	if (1==2) {
+				this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+				this.game.scale.pageAlignHorizontally = true;
+				this.game.scale.pageAlignVertically = true;
+			}
 
             //  We need this because the assets are on Amazon S3
             //  Remove the next 2 lines if running locally
@@ -636,7 +654,9 @@
             this.load.image('background', 'assets/back.png');
             this.load.image('foreground', 'assets/fore.png');
             this.load.image('player', 'assets/cr.png');
+            this.load.spritesheet('en1', 'assets/en1.png');
             this.load.bitmapFont('shmupfont', 'assets/shmupfont.png', 'assets/shmupfont.xml');
+            this.load.image('wall', 'assets/back.png');
 
             for (var i = 1; i <= 11; i++)
             {
@@ -652,21 +672,10 @@
             //this.background = this.add.tileSprite(0, 0, this.game.width, this.game.height, 'background');
            // this.background.autoScroll(-40, 0);
            
-           var polyPoints = []
-			
-			for (var i = 0; i < gArr.length; i++)
-            {
-                polyPoints.push(gArr[i][0]);
-                polyPoints.push(gArr[i][1]);
-            }
-			
-			gPoly = new Phaser.Polygon(polyPoints);
-
-			graphics = game.add.graphics(0, 0);
-
-			graphics.beginFill(0xCCCCCC, 0.3);
-			graphics.drawPolygon(gPoly.points);
-			graphics.endFill();
+           graphicsLine=game.add.graphics(0,0);
+           graphics = game.add.graphics(0, 0);
+           
+           
 
             this.weapons.push(new Weapon.SingleBullet(this.game));
             this.weapons.push(new Weapon.FrontAndBack(this.game));
@@ -689,12 +698,40 @@
             }
             
 
+
+
             this.player = this.add.sprite(mainOffsetX, mainOffsetY, 'player');
+            //this.en1 =  this.add.sprite(mainWidth/2, mainHeight/2, 'en1');
+            this.en1 =  this.add.sprite(22, 618, 'en1');
+            
+            this.walls = this.game.add.group();
+            
 
             this.physics.arcade.enable(this.player);
+            this.physics.arcade.enable(this.en1);
+
+            
+                       
 
            // this.player.body.collideWorldBounds = true;
+           this.en1.body.collideWorldBounds = true;
+            this.en1.body.velocity.setTo(250, 250);
+            //this.en1.body.velocity.setTo(550, 550);
+           this.en1.body.bounce.set(1);
+
+           
+           
+          
+           
+
+           
             
+            // add our polygon collider sprite
+			  // and give it physics
+			 // this.polygonCollisionSprite = this.add.sprite(mainOffsetX, mainOffsetY,'check');  
+			 // this.physics.arcade.enable(this.polygonCollisionSprite);
+			 
+			 
             this.bmd = this.add.bitmapData(this.game.width, this.game.height);
 			this.bmd.addToWorld();
 
@@ -748,15 +785,23 @@
 				
 					if (getDirNow[1] == "up") {
 						this.mode ="right";
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
 					
 					} else if (getDirNow[1] == "down") {
 						this.mode ="left";
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
 					
 					}  else if (getDirNow[1] == "left") {
 						this.mode ="up";
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
 					
 					}  else if (getDirNow[1] == "right") {
 						this.mode ="down";
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
 					}
 				
 					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
@@ -765,26 +810,26 @@
 					this.mode = this.turn;
 					this.turn = "up";
 					this.player.angle = 270;
-					//var posArr = [gPiece.x,gPiece.y];
-					//trace.push(posArr);
+					var posArr = [this.player.x,this.player.y];
+					trace.push(posArr);
 				} else if (this.mode == "up") {
 					this.mode = this.turn;
 					this.turn = "up";
 					this.player.angle = 270;
-					//var posArr = [gPiece.x,gPiece.y];
-					//trace.push(posArr);
+					var posArr = [this.player.x,this.player.y];
+					trace.push(posArr);
 				} else if (this.mode == "left") {
 					this.mode = this.turn;
 					this.turn = "left";
 					this.player.angle = 180;
-					//var posArr = [gPiece.x,gPiece.y];
-					//trace.push(posArr);
+					var posArr = [this.player.x,this.player.y];
+					trace.push(posArr);
 				} else if (this.mode == "right") {
 					this.mode = this.turn;
 					this.turn = "left";
 					this.player.angle = 180;
-					//var posArr = [gPiece.x,gPiece.y];
-					//trace.push(posArr);
+					var posArr = [this.player.x,this.player.y];
+					trace.push(posArr);
 				}
 			},
 
@@ -882,10 +927,49 @@
            
 
         },
+        drawTrace: function () {
+			//draw out path from trace
+			if (trace.length>0) {
+				/*
+				ctx = gArea.context;
+				ctx.beginPath();
+				ctx.moveTo(trace[0][0],trace[0][1]);
+				for (var i = 0; i < trace.length; i++) {
+			
+					ctx.lineTo(trace[i][0],trace[i][1]);
+				}
+				ctx.lineTo(gPiece.x,gPiece.y);
+
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = "blue";
+				ctx.stroke();*/
+				
+				
+				graphicsLine.lineStyle(2, 0xffd900, 1);
+				graphicsLine.moveTo(trace[0][0],trace[0][1]);
+				
+				for (var i = 1; i < trace.length; i++) {
+			
+					 graphicsLine.lineTo(trace[i][0],trace[i][1]);
+				}
+				graphicsLine.lineTo(this.player.x,this.player.y);
+				graphicsLine.endFill();
+			} else {
+				//alert("000");
+			}
+		},
 
         update: function () {
 
 			updateDelay++;
+			
+			
+			 
+			  this.physics.arcade.collide(this.wall1, this.en1);
+			 
+			 
+			//this.en1.body.velocity.x += 5;
+			
             //this.player.body.velocity.set(0);
             
 			//if (updateDelay % (7) == 0) {
@@ -922,9 +1006,91 @@
 					}
 			
 				}*/
+				graphicsLine.clear();
+				graphics.clear();
 				
+				var polyPoints = []
+			
+				for (var i = 0; i < gArr.length; i++)
+				{
+					polyPoints.push(gArr[i][0]);
+					polyPoints.push(gArr[i][1]);
+				}
+			
+				gPoly = new Phaser.Polygon(polyPoints);
+
+			
+
+				graphics.beginFill(0xCCCCCC, 0.3);
+				graphics.drawPolygon(gPoly.points);
+				graphics.endFill();
+				
+				this.walls.removeAll(true);
+				
+				var collSize = 3;
+				
+				//create rectangle sprites for all the paths
+				for (var i = 0; i < gArr.length; i++)
+				{
+					var pasti = i-1;
+					if (i-1<0) {
+						pasti=gArr.length-1;
+					}
+					//which position to use as start point?
+					var startX = gArr[i][0];
+					var startY = gArr[i][1];
+					//if horizontal path
+					if (gArr[i][0] - gArr[pasti][0]==0) {
+						if (gArr[i][1]<gArr[pasti][1]) {
+							//up
+							startY = gArr[i][1];
+						} else {
+							//down
+							startY = gArr[pasti][1];
+						}
+					} else {
+					//vertical
+						if (gArr[i][0]>gArr[pasti][0]) {
+							//right
+							startX = gArr[pasti][0];
+						} else {
+							//left
+							startX = gArr[i][0];
+						}
+					}
+					var wall1 =  this.add.sprite(startX, startY, 'wall');
+					
+					
+					wall1.width = Math.max(Math.abs(gArr[i][0] - gArr[pasti][0]),collSize);
+					wall1.height = Math.max(Math.abs(gArr[i][1] - gArr[pasti][1]),collSize);
+					this.physics.arcade.enable(wall1);
+					wall1.body.immovable = true;
+			
+					this.walls.add(wall1);
+				
+				
+				}
+				           
+           
+				
+				
+				/*var wall1 =  this.add.sprite(162, 218, 'wall');
+				wall1.width =210;
+				wall1.height =5;
+				this.physics.arcade.enable(wall1);
+				wall1.body.immovable = true;
+				
+				this.walls.add(wall1);*/
+				
+				
+				
+				this.game.physics.arcade.collide(this.en1, this.walls);
+
 				this.player.anchor.set(0.5);
-				
+
+				this.en1.anchor.set(0.5);
+				this.en1.angle +=4;
+			
 				
 				if (updateDelay % (55) == 0) {
 					if (this.mode=="down") {
@@ -964,48 +1130,53 @@
 					}
 		
 				}
+				var pSpd = 5;
+				var pSpd2 = 1;
 				
-				
+				if (updateDelay % (1) == 0) {
 			
-				if (this.mode === 0)
-				{
-					var getDirNow = getStep (this.player.x ,this.player.y);
-					//console.log(this.player.x + "::" + this.player.y + "::" + getDirNow[0] + "::" + getDirNow[1]);
+					if (this.mode === 0)
+					{
+						var getDirNow = getStep (this.player.x ,this.player.y);
+						//console.log(this.player.x + "::" + this.player.y + "::" + getDirNow[0] + "::" + getDirNow[1]);
 				
-					if (getDirNow[1] == "up") {
-						this.player.y -= 5;
-						this.player.angle = 0;
-						if (this.player.y < gArr[getDirNow[0]][1]) {
-							this.player.y = gArr[getDirNow[0]][1];
-						}
+						if (getDirNow[1] == "up") {
+							this.player.y -= pSpd;
+							this.player.angle = 0;
+							if (this.player.y < gArr[getDirNow[0]][1]) {
+								this.player.y = gArr[getDirNow[0]][1];
+							}
 					
-					} else if (getDirNow[1] == "down") {
-						this.player.y += 5;
-						this.player.angle = 180;
-						if (this.player.y > gArr[getDirNow[0]][1]) {
-							this.player.y = gArr[getDirNow[0]][1];
-						}
+						} else if (getDirNow[1] == "down") {
+							this.player.y += pSpd;
+							this.player.angle = 180;
+							if (this.player.y > gArr[getDirNow[0]][1]) {
+								this.player.y = gArr[getDirNow[0]][1];
+							}
 					
-					}  else if (getDirNow[1] == "left") {
-						this.player.x -= 5;
-						this.player.angle = 270;
-						if (this.player.x < gArr[getDirNow[0]][0]) {
-							this.player.x = gArr[getDirNow[0]][0];
-						}
+						}  else if (getDirNow[1] == "left") {
+							this.player.x -= pSpd;
+							this.player.angle = 270;
+							if (this.player.x < gArr[getDirNow[0]][0]) {
+								this.player.x = gArr[getDirNow[0]][0];
+							}
 					
-					}  else if (getDirNow[1] == "right") {
-						this.player.x += 5;
-						this.player.angle = 90;
-						if (this.player.x > gArr[getDirNow[0]][0]) {
-							this.player.x = gArr[getDirNow[0]][0];
+						}  else if (getDirNow[1] == "right") {
+							this.player.x += pSpd;
+							this.player.angle = 90;
+							if (this.player.x > gArr[getDirNow[0]][0]) {
+								this.player.x = gArr[getDirNow[0]][0];
+							}
 						}
-					}
 				
-					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
+						//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
 					
 					
 				
-				} else {
+					} 
+				}
+				if (updateDelay % (1) == 0) {
+				 
 		
 			
 			
@@ -1016,23 +1187,26 @@
 					var preY = this.player.y;
 		
 					if (this.mode === "down") {
-						this.player.y += 2;
-				
+						this.player.y += pSpd2;
+						this.drawTrace();
 					} else if (this.mode === "up") {
-						this.player.y -= 2;
-				
+						this.player.y -= pSpd2;
+						this.drawTrace();
 					} else if (this.mode === "left") {
-						this.player.x -= 2;
-				
+						this.player.x -= pSpd2;
+						this.drawTrace();
 					} else if (this.mode === "right") {
-						this.player.x += 2;
-				
+						this.player.x += pSpd2;
+						this.drawTrace();
 					}
 					//check all paths, if touch wall, park on border line and change mode
 					if (!gPoly.contains(this.player.x, this.player.y)) {
 						//alert("out");
+						//trace=[];
+						//this.drawTrace();
+								
 						var intFlag = -1;
-						var line1 = new Phaser.Line(preX, preY, this.player.x, this.player.y);
+						line1 = new Phaser.Line(preX, preY, this.player.x, this.player.y);
 						for (var i = 0; i < gArr.length; i++) {
 						
 							var pasti = i-1;
@@ -1040,23 +1214,210 @@
 								pasti=gArr.length-1;
 							}
 							
-							var line2 = new Phaser.Line(gArr[pasti][0], gArr[pasti][1], gArr[i][0], gArr[i][1]);
+							line2 = new Phaser.Line(gArr[pasti][0], gArr[pasti][1], gArr[i][0], gArr[i][1]);
 							
 							p = line1.intersects(line2, true);
 
-							if (p)
-							{
+							if (p) {
 								intFlag = i;
 								this.mode = 0;
 								this.player.x = p.x;
 								this.player.y = p.y;
-							} else
-							{
+								//console.log(trace);
+								
+								//enter final insertion position 
+								var posArr = [this.player.x,this.player.y];
+								trace.push(posArr);
+								
+								//divide into 2 polygons and check size
+								
+								//get origin insertion point 1 path
+								var tpath1 = getStep(trace[0][0],trace[0][1]);
+				
+								//get final insertion point 2 path
+								var tpath2 = getStep(trace[trace.length-1][0],trace[trace.length-1][1]);
+				
+								var path1;
+								var path2;
+								
+								//Set closer to path 0 point as first path
+								if (tpath2[0]>tpath1[0]) {
+									path1 = tpath1;
+									path2 = tpath2;
+					
+								} else if (tpath2[0]<tpath1[0]) {
+									path1 = tpath2;
+									path2 = tpath1;
+									trace = trace.reverse();
+					
+					
+								} else if (tpath2[0]==tpath1[0]) {
+									//check which came first
+					
+									path1 = tpath1;
+									path2 = tpath2;
+									//alert(path1[1]);
+					
+									//check path which is nearer to path point
+									if (path1[1]=="up") {
+										if (trace[0][1] < trace[trace.length-1][1]) {
+											trace = trace.reverse();
+										}
+									} else if (path1[1]=="down") {
+										if (trace[0][1] > trace[trace.length-1][1]) {
+											trace = trace.reverse();
+										}
+									} else if (path1[1]=="left") {
+										if (trace[0][0] < trace[trace.length-1][0]) {
+											trace = trace.reverse();
+										}
+									} else if (path1[1]=="right") {
+										//alert(trace[0][1] + ":::" + trace[trace.length-1][1]);
+										if (trace[0][0] > trace[trace.length-1][0]) {
+											trace = trace.reverse();
+										}
+									}
+								}
+								
+								//create now pathArrs
+								var newPathArr1 = [];
+								var newPathArr2 = [];
+				
+								//create path array 1
+								//Insert new paths starting from path 0
+								//what if path 1 = 0?
+								for (var i = 0; i < path1[0]; i++) {
+									newPathArr1.push (gArr[i]);
+								}
+								//insert trace path
+								for (var i = 0; i < trace.length; i++) {
+									newPathArr1.push (trace[i]);
+								}
+								//insert paths after insertion point 2
+								for (var i = path2[0]; i < gArr.length; i++) {
+									newPathArr1.push (gArr[i]);
+								}
+				
+								//create path array 2
+								trace = trace.reverse();
+				
+								for (var i = (path1[0]); i < (path2[0]); i++) {
+									newPathArr2.push (gArr[i]);
+								}
+								//insert trace path
+								for (var i = 0; i < trace.length; i++) {
+									newPathArr2.push (trace[i]);
+								}
+								
+								console.log(newPathArr1);
+								console.log(newPathArr2);
+								
+								
+								 
+								 
+								var polyPoints = []
+			
+								for (var i = 0; i < newPathArr1.length; i++)
+								{
+									polyPoints.push(newPathArr1[i][0]);
+									polyPoints.push(newPathArr1[i][1]);
+								}
+			
+								gPoly = new Phaser.Polygon(polyPoints);
+								
+								if (gPoly.contains(this.en1.x, this.en1.y)) {
+								
+									gArr = [];
+								
+									for (var i = 0; i <  newPathArr1.length; i++) {
+										gArr.push([newPathArr1[i][0],newPathArr1[i][1]]);
+									}
+								
+								
+								} else {
+									gArr = [];
+								
+									for (var i = 0; i <  newPathArr2.length; i++) {
+										gArr.push([newPathArr2[i][0],newPathArr2[i][1]]);
+									}
+								}
+
+								/*
+
+								var graphics1 = game.add.graphics(0, 0);
+								graphics1.beginFill(0xCCCCFF, 1);
+								graphics1.drawPolygon(gPoly.points);
+								graphics1.endFill();
+			
+			
+								var graphics2 = game.add.graphics(0, 0);
+								 
+													var polyPoints2 = []
+			
+								for (var i = 0; i < newPathArr2.length; i++)
+								{
+									polyPoints2.push(newPathArr2[i][0]);
+									polyPoints2.push(newPathArr2[i][1]);
+								}
+			
+								gPoly = new Phaser.Polygon(polyPoints2);
+
+			
+
+								graphics2.beginFill(0xCCCC00, 1);
+								graphics2.drawPolygon(gPoly.points);
+								graphics2.endFill();
+								*/
+			
+			
+				
+									
+								//compare which has lesser area
+								/*var area1x = [];
+								var area1y = [];
+								var area1p = newPathArr1.length;
+				
+								for (var i = 0; i <  newPathArr1.length; i++) {
+									area1x.push (newPathArr1[i][0]);
+									area1y.push (newPathArr1[i][1]);
+								}
+				
+								var area1 = Math.abs(polygonArea(area1x, area1y, area1p)) ;
+				
+				
+								var area2x = [];
+								var area2y = [];
+								var area2p = newPathArr2.length;
+				
+								for (var i = 0; i <  newPathArr2.length; i++) {
+									area2x.push (newPathArr2[i][0]);
+									area2y.push (newPathArr2[i][1]);
+								}*/
+								
+								//gArr = newPathArr1;
+								
+								
+								
+								
+								
+								
+								//this.player.x=gArr[0][0];
+								//this.player.y=gArr[0][1];
+								
+								
+								
+								trace = [];
+								this.drawTrace();
+								
+								
+								
+							} else {
 								
 							}
 						}
 					}
 				}
+				
 			
 			
 			
@@ -1087,8 +1448,8 @@
             {
                 this.weapons[this.currentWeapon].fire(this.player);
             }
-            
-
+            game.world.bringToTop(this.walls);
+			game.world.bringToTop(this.player);
         }
 
     };
