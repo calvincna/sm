@@ -807,29 +807,44 @@
 					//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
 				
 				} else if (this.mode == "down") {
-					this.mode = this.turn;
-					this.turn = "up";
-					this.player.angle = 270;
-					var posArr = [this.player.x,this.player.y];
-					trace.push(posArr);
+				
+					var turnMin = 10;
+					
+					//if not enough don't turn
+					
+					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin) {
+					
+					
+						this.mode = this.turn;
+						this.turn = "up";
+						this.player.angle = 270;
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
+					}
 				} else if (this.mode == "up") {
-					this.mode = this.turn;
-					this.turn = "up";
-					this.player.angle = 270;
-					var posArr = [this.player.x,this.player.y];
-					trace.push(posArr);
+					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin) {
+						this.mode = this.turn;
+						this.turn = "up";
+						this.player.angle = 270;
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
+					}
 				} else if (this.mode == "left") {
-					this.mode = this.turn;
-					this.turn = "left";
-					this.player.angle = 180;
-					var posArr = [this.player.x,this.player.y];
-					trace.push(posArr);
+					if (Math.abs(trace[trace.length-1][0]-this.player.x>turnMin) {
+						this.mode = this.turn;
+						this.turn = "left";
+						this.player.angle = 180;
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
+					}
 				} else if (this.mode == "right") {
-					this.mode = this.turn;
-					this.turn = "left";
-					this.player.angle = 180;
-					var posArr = [this.player.x,this.player.y];
-					trace.push(posArr);
+					if (Math.abs(trace[trace.length-1][1]-this.player.y>turnMin) {
+						this.mode = this.turn;
+						this.turn = "left";
+						this.player.angle = 180;
+						var posArr = [this.player.x,this.player.y];
+						trace.push(posArr);
+					}
 				}
 			},
 
