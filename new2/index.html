@@ -856,6 +856,11 @@
 					
 				}
 			},
+			
+			traceOverlap: function () {
+				alert("Game over");
+				en1.destroy();
+			},
 
         nextWeapon: function () {
 
@@ -987,9 +992,7 @@
 
 			updateDelay++;
 			
-			
 			 
-			  this.physics.arcade.collide(this.wall1, this.en1);
 			 
 			 
 			//this.en1.body.velocity.x += 5;
@@ -1033,67 +1036,8 @@
 				graphicsLine.clear();
 				graphics.clear();
 				
-				var polyPoints = []
-			
-				for (var i = 0; i < gArr.length; i++)
-				{
-					polyPoints.push(gArr[i][0]);
-					polyPoints.push(gArr[i][1]);
-				}
-			
-				gPoly = new Phaser.Polygon(polyPoints);
-
-			
-
-				graphics.beginFill(0xCCCCCC, 0.3);
-				graphics.drawPolygon(gPoly.points);
-				graphics.endFill();
-				
-				this.walls.removeAll(true);
-				
-				var collSize = 1;
-				
-				//create rectangle sprites for all the paths
-				for (var i = 0; i < gArr.length; i++)
-				{
-					var pasti = i-1;
-					if (i-1<0) {
-						pasti=gArr.length-1;
-					}
-					//which position to use as start point?
-					var startX = gArr[i][0];
-					var startY = gArr[i][1];
-					//if horizontal path
-					if (gArr[i][0] - gArr[pasti][0]==0) {
-						if (gArr[i][1]<gArr[pasti][1]) {
-							//up
-							//startY = gArr[i][1];
-						} else {
-							//down
-							startY = gArr[pasti][1];
-						}
-					} else {
-					//vertical
-						if (gArr[i][0]>gArr[pasti][0]) {
-							//right
-							startX = gArr[pasti][0];
-						} else {
-							//left
-							//startX = gArr[i][0];
-						}
-					}
-					var wall1 =  this.add.sprite(startX, startY, 'wall');
-					
-					
-					wall1.width = Math.max(Math.abs(gArr[i][0] - gArr[pasti][0]),collSize);
-					wall1.height = Math.max(Math.abs(gArr[i][1] - gArr[pasti][1]),collSize);
-					this.physics.arcade.enable(wall1);
-					wall1.body.immovable = true;
-			
-					this.walls.add(wall1);
 				
 				
-				}
 				
 				this.traces.removeAll(true);
 				
@@ -1134,6 +1078,7 @@
 						wall1.height = Math.max(Math.abs(traceArr[i][1] - traceArr[i-1][1]),collSize);
 						this.physics.arcade.enable(wall1);
 						wall1.body.immovable = true;
+						//this.game.physics.arcade.overlap(wall1, this.traces, this.traceOverlap, null, this);   
 			
 						this.traces.add(wall1);
 					}
@@ -1172,26 +1117,19 @@
 					wall1.height = Math.max(Math.abs(this.player.y - traceArr[traceArr.length-1][1]),collSize);
 					this.physics.arcade.enable(wall1);
 					wall1.body.immovable = true;
+					//this.game.physics.arcade.overlap(wall1, this.traces, this.traceOverlap, null, this);  
 		
 					this.traces.add(wall1);
 				}
 				
-				
-				           
+				//this.game.physics.arcade.overlap(this.traces, this.traces, this.traceOverlap, null, this);   
+				//this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
            
 				
 				
-				/*var wall1 =  this.add.sprite(162, 218, 'wall');
-				wall1.width =210;
-				wall1.height =5;
-				this.physics.arcade.enable(wall1);
-				wall1.body.immovable = true;
-				
-				this.walls.add(wall1);*/
 				
 				
 				
-				this.game.physics.arcade.collide(this.en1, this.walls);
 
 				this.player.anchor.set(0.5);
 
@@ -1285,7 +1223,6 @@
 				if (updateDelay % (1) == 0) {
 				 
 		
-			
 			
 					//if gMode is 1 and position not on wall advance in direction
 					//if gMode is 1 and position touched wall, change mode to 0
@@ -1418,8 +1355,6 @@
 								
 								//console.log(newPathArr1);
 								//console.log(newPathArr2);
-								
-								
 								 
 								 
 								var polyPoints = []
@@ -1504,14 +1439,8 @@
 								//gArr = newPathArr1;
 								
 								
-								
-								
-								
-								
 								//this.player.x=gArr[0][0];
 								//this.player.y=gArr[0][1];
-								
-								
 								
 								traceArr = [];
 								this.drawtraceArr();
@@ -1526,7 +1455,68 @@
 				}
 				
 			
+			var polyPoints = []
 			
+				for (var i = 0; i < gArr.length; i++)
+				{
+					polyPoints.push(gArr[i][0]);
+					polyPoints.push(gArr[i][1]);
+				}
+			
+				gPoly = new Phaser.Polygon(polyPoints);
+			
+
+				graphics.beginFill(0xCCCCCC, 0.3);
+				graphics.drawPolygon(gPoly.points);
+				graphics.endFill();
+				
+				this.walls.removeAll(true);
+				
+				var collSize = 1;
+				
+				//create rectangle sprites for all the paths
+				for (var i = 0; i < gArr.length; i++)
+				{
+					var pasti = i-1;
+					if (i-1<0) {
+						pasti=gArr.length-1;
+					}
+					//which position to use as start point?
+					var startX = gArr[i][0];
+					var startY = gArr[i][1];
+					//if horizontal path
+					if (gArr[i][0] - gArr[pasti][0]==0) {
+						if (gArr[i][1]<gArr[pasti][1]) {
+							//up
+							//startY = gArr[i][1];
+						} else {
+							//down
+							startY = gArr[pasti][1];
+						}
+					} else {
+					//vertical
+						if (gArr[i][0]>gArr[pasti][0]) {
+							//right
+							startX = gArr[pasti][0];
+						} else {
+							//left
+							//startX = gArr[i][0];
+						}
+					}
+					var wall1 =  this.add.sprite(startX, startY, 'wall');
+					
+					
+					wall1.width = Math.max(Math.abs(gArr[i][0] - gArr[pasti][0]),collSize);
+					wall1.height = Math.max(Math.abs(gArr[i][1] - gArr[pasti][1]),collSize);
+					this.physics.arcade.enable(wall1);
+					wall1.body.immovable = true;
+			
+					this.walls.add(wall1);
+				
+				
+				}
+				
+				this.game.physics.arcade.collide(this.en1, this.walls);
 			
             
            //	if (game.input.activePointer.isDown)
@@ -1555,6 +1545,9 @@
             {
                 this.weapons[this.currentWeapon].fire(this.player);
             }
+            
+            
+            
             game.world.bringToTop(this.walls);
             game.world.bringToTop(this.traces);
 			game.world.bringToTop(this.player);
