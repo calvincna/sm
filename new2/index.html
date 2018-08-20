@@ -993,6 +993,7 @@
 			updateDelay++;
 			
 			 
+			  //this.physics.arcade.collide(this.wall1, this.en1);
 			 
 			 
 			//this.en1.body.velocity.x += 5;
@@ -1035,6 +1036,24 @@
 				}*/
 				graphicsLine.clear();
 				graphics.clear();
+				
+				var polyPoints = []
+			
+				for (var i = 0; i < gArr.length; i++)
+				{
+					polyPoints.push(gArr[i][0]);
+					polyPoints.push(gArr[i][1]);
+				}
+			
+				gPoly = new Phaser.Polygon(polyPoints);
+
+			
+
+				graphics.beginFill(0xCCCCCC, 0.3);
+				graphics.drawPolygon(gPoly.points);
+				graphics.endFill();
+				
+				var collSize = 1;
 				
 				
 				
@@ -1123,9 +1142,17 @@
 				}
 				
 				//this.game.physics.arcade.overlap(this.traces, this.traces, this.traceOverlap, null, this);   
-				//this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
+				this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
            
 				
+				
+				/*var wall1 =  this.add.sprite(162, 218, 'wall');
+				wall1.width =210;
+				wall1.height =5;
+				this.physics.arcade.enable(wall1);
+				wall1.body.immovable = true;
+				
+				this.walls.add(wall1);*/
 				
 				
 				
@@ -1223,6 +1250,7 @@
 				if (updateDelay % (1) == 0) {
 				 
 		
+			
 			
 					//if gMode is 1 and position not on wall advance in direction
 					//if gMode is 1 and position touched wall, change mode to 0
@@ -1355,6 +1383,8 @@
 								
 								//console.log(newPathArr1);
 								//console.log(newPathArr2);
+								
+								
 								 
 								 
 								var polyPoints = []
@@ -1439,8 +1469,14 @@
 								//gArr = newPathArr1;
 								
 								
+								
+								
+								
+								
 								//this.player.x=gArr[0][0];
 								//this.player.y=gArr[0][1];
+								
+								
 								
 								traceArr = [];
 								this.drawtraceArr();
@@ -1455,24 +1491,7 @@
 				}
 				
 			
-			var polyPoints = []
-			
-				for (var i = 0; i < gArr.length; i++)
-				{
-					polyPoints.push(gArr[i][0]);
-					polyPoints.push(gArr[i][1]);
-				}
-			
-				gPoly = new Phaser.Polygon(polyPoints);
-			
-
-				graphics.beginFill(0xCCCCCC, 0.3);
-				graphics.drawPolygon(gPoly.points);
-				graphics.endFill();
-				
-				this.walls.removeAll(true);
-				
-				var collSize = 1;
+			this.walls.removeAll(true);
 				
 				//create rectangle sprites for all the paths
 				for (var i = 0; i < gArr.length; i++)
@@ -1545,9 +1564,6 @@
             {
                 this.weapons[this.currentWeapon].fire(this.player);
             }
-            
-            
-            
             game.world.bringToTop(this.walls);
             game.world.bringToTop(this.traces);
 			game.world.bringToTop(this.player);
