@@ -30,6 +30,7 @@
 	var gPoly;
 	var graphics;
 	var graphicsLine;
+	var graphics2;
 	var line1;
 	var line2;
 	
@@ -675,7 +676,7 @@
            
            graphicsLine=game.add.graphics(0,0);
            graphics = game.add.graphics(0, 0);
-           
+           graphics2 =game.add.graphics(0,0);
            
 
             this.weapons.push(new Weapon.SingleBullet(this.game));
@@ -1399,11 +1400,7 @@
 								
 								if (gPoly.contains(this.en1.x, this.en1.y)) {
 								
-									var graphics2 =game.add.graphics(0,0);
-									graphics2.lineStyle(10, 0xff0000, 1);
-									graphics2.moveTo(this.en1.x, this.en1.y);
-									graphics2.lineTo(this.en1.x+1, this.en1.y+1);
-									graphics2.endFill();
+									
 								
 									gArr = [];
 								
@@ -1419,6 +1416,12 @@
 										gArr.push([newPathArr2[i][0],newPathArr2[i][1]]);
 									}
 								}
+								
+								
+									graphics2.lineStyle(10, 0xff0000, 1);
+									graphics2.moveTo(this.en1.x, this.en1.y);
+									graphics2.lineTo(this.en1.x+1, this.en1.y+1);
+									graphics2.endFill();
 
 								/*
 
