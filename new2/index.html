@@ -11,6 +11,12 @@
 
     <script type="text/javascript">
     
+    // variables used to detect and manage swipes
+     var startswX;
+     var startswY;
+     var endswX;
+     var endswY;
+    
     var updateDelay = 0;
 
 	var mainTop = 0;
@@ -747,7 +753,9 @@
 			
 			this.areaTxt = this.add.bitmapText(8, 4, 'shmupfont', "100%", 15);
 
-			game.input.onDown.add(this.gTap, this);
+			//game.input.onDown.add(this.gTap, this);
+			
+			game.input.onDown.add(this.beginSwipe, this);
 
 			//  Cursor keys to fly + space to fire
 			this.cursors = this.input.keyboard.createCursorKeys();
@@ -758,6 +766,185 @@
 			changeKey.onDown.add(this.nextWeapon, this);
 
         },
+        beginSwipe: function(pointer) {
+			startswX = game.input.worldX;
+			startswY = game.input.worldY;
+			game.input.onDown.remove(this.beginSwipe, this);
+			game.input.onUp.add(this.endSwipe, this);
+			
+			//game.input.onDown.remove(this.beginSwipe);
+			//game.input.onUp.add(this.endSwipe);
+		},
+		// function to be called when the player releases the mouse/finger
+		endSwipe: function() {
+		
+		
+			//if mode 0, just move based on path dir
+			var turnMin = 5;
+				
+			if (this.mode === 0)
+			{
+				var getDirNow = getStep (this.player.x ,this.player.y);
+				//console.log(this.player.x + "::" + this.player.y + "::" + getDirNow[0] + "::" + getDirNow[1]);
+			
+				if (getDirNow[1] == "up") {
+					this.mode ="right";
+					this.turn = "up";
+					this.player.angle = 270;
+					var posArr = [this.player.x,this.player.y];
+					traceArr.push(posArr);
+				
+				} else if (getDirNow[1] == "down") {
+					this.mode ="left";
+					this.turn = "up";
+					this.player.angle = 270;
+					var posArr = [this.player.x,this.player.y];
+					traceArr.push(posArr);
+				
+				}  else if (getDirNow[1] == "left") {
+					this.mode ="up";
+					this.turn = "left";
+					this.player.angle = 180;
+					var posArr = [this.player.x,this.player.y];
+					traceArr.push(posArr);
+				
+				}  else if (getDirNow[1] == "right") {
+					this.mode ="down";
+					this.turn = "left";
+					this.player.angle = 180;
+					var posArr = [this.player.x,this.player.y];
+					traceArr.push(posArr);
+				}
+			
+				//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
+			
+			} else {
+			
+			
+			
+				// saving mouse/finger coordinates
+				endswX = game.input.worldX;
+				endswY = game.input.worldY;
+				// determining x and y distance travelled by mouse/finger from the start
+				// of the swipe until the end
+				var distX = startswX-endswX;
+				var distY = startswY-endswY;
+				// in order to have an horizontal swipe, we need that x distance is at least twice the y distance
+				// and the amount of horizontal distance is at least 10 pixels
+				if(Math.abs(distX)>Math.abs(distY)*2 && Math.abs(distX)>10){
+				
+					// moving left, calling move function with horizontal and vertical tiles to move as arguments
+					if(distX>0){
+						//move(-1,0);
+						if ((this.mode == "down")||(this.mode == "up")) {
+							if (Math.abs(traceArr[traceArr.length-1][1]-this.player.y)>turnMin) {
+								this.mode = "left";
+								this.turn = "up";
+								this.player.angle = 270;
+								var posArr = [this.player.x,this.player.y];
+								traceArr.push(posArr);
+							}
+						} 
+					}
+					// moving right, calling move function with horizontal and vertical tiles to move as arguments
+					else{
+						//move(1,0);
+						if ((this.mode == "down")||(this.mode == "up")) {
+							if (Math.abs(traceArr[traceArr.length-1][1]-this.player.y)>turnMin) {
+								this.mode = "right";
+								this.turn = "up";
+								this.player.angle = 270;
+								var posArr = [this.player.x,this.player.y];
+								traceArr.push(posArr);
+							}
+						} 
+					}
+					   
+				}
+				// in order to have a vertical swipe, we need that y distance is at least twice the x distance
+				// and the amount of vertical distance is at least 10 pixels
+				else if(Math.abs(distY)>Math.abs(distX)*2 && Math.abs(distY)>10){
+				
+					// moving up, calling move function with horizontal and vertical tiles to move as arguments
+					if(distY>0){
+						//move(0,-1);
+						if ((this.mode == "left")||(this.mode == "right")) {
+							if (Math.abs(traceArr[traceArr.length-1][0]-this.player.x)>turnMin) {
+								this.mode = "up";
+								this.turn = "left";
+								this.player.angle = 180;
+								var posArr = [this.player.x,this.player.y];
+								traceArr.push(posArr);
+							}
+						}
+					}
+					// moving down, calling move function with horizontal and vertical tiles to move as arguments
+					else{
+						//move(0,1);
+						if ((this.mode == "left")||(this.mode == "right")) {
+							if (Math.abs(traceArr[traceArr.length-1][0]-this.player.x)>turnMin) {
+								this.mode = "down";
+								this.turn = "left";
+								this.player.angle = 180;
+								var posArr = [this.player.x,this.player.y];
+								traceArr.push(posArr);
+							}
+						}
+					}
+					
+				} else {
+				
+					//normal tap
+				
+					if (this.mode == "down") {
+						/*alert("1::" + traceArr[traceArr.length-1][0] + ", " +traceArr[traceArr.length-1][1]);
+						alert("2::" + this.player.x + ", " + this.player.y);
+						alert("3::" + traceArr[traceArr.length-1][1] + ", " + this.player.y);
+						alert("4::" + (Number(traceArr[traceArr.length-1][1])-Number(this.player.y)));*/
+						if (Math.abs(traceArr[traceArr.length-1][1]-this.player.y)>turnMin) {
+							this.mode = this.turn;
+							this.turn = "up";
+							this.player.angle = 270;
+							var posArr = [this.player.x,this.player.y];
+							traceArr.push(posArr);
+						}
+					} else if (this.mode == "up") {
+						if (Math.abs(traceArr[traceArr.length-1][1]-this.player.y)>turnMin) {
+							this.mode = this.turn;
+							this.turn = "up";
+							this.player.angle = 270;
+							var posArr = [this.player.x,this.player.y];
+							traceArr.push(posArr);
+						}
+					} else if (this.mode == "left") {
+						if (Math.abs(traceArr[traceArr.length-1][0]-this.player.x)>turnMin) {
+							this.mode = this.turn;
+							this.turn = "left";
+							this.player.angle = 180;
+							var posArr = [this.player.x,this.player.y];
+							traceArr.push(posArr);
+						}
+					} else if (this.mode == "right") {
+						if (Math.abs(traceArr[traceArr.length-1][0]-this.player.x)>turnMin) {
+							this.mode = this.turn;
+							this.turn = "left";
+							this.player.angle = 180;
+							var posArr = [this.player.x,this.player.y];
+							traceArr.push(posArr);
+						}
+					
+					}
+					
+				}
+			
+			}
+			
+			// stop listening for the player to release finger/mouse, let's start listening for the player to click/touch
+			game.input.onDown.add(this.beginSwipe, this);
+			
+			//game.input.onDown.add(this.beginSwipe);
+			game.input.onUp.remove(this.endSwipe, this);
+		},
         
         gTap: function(pointer) {
 				//this.weapons[this.currentWeapon].fire(this.player);
