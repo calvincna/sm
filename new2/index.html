@@ -958,8 +958,6 @@
 
 				updateDelay++;
 				
-				var collSize = 1;
-				
 				this.player.anchor.set(0.5);
 				this.en1.anchor.set(0.5);
 			
@@ -1006,6 +1004,8 @@
 				graphics.beginFill(0xCCCCCC, 0.3);
 				graphics.drawPolygon(gPoly.points);
 				graphics.endFill();
+				
+				var collSize = 1;
 				
 				this.traces.removeAll(true);
 				
@@ -1380,7 +1380,6 @@
 						}
 					}
 					var wall1 =  this.add.sprite(startX, startY, 'wall');
-					wall1.anchor.set(0.5);
 					wall1.width = Math.max(Math.abs(gArr[i][0] - gArr[pasti][0]),collSize);
 					wall1.height = Math.max(Math.abs(gArr[i][1] - gArr[pasti][1]),collSize);
 					this.physics.arcade.enable(wall1);
