@@ -61,16 +61,24 @@
 	var areaOpt = false;
 	
 	if	(getParameterByName('trace')) {
-		traceOpt = getParameterByName('trace');
+		if (getParameterByName('trace')!="0") {
+			traceOpt = getParameterByName('trace');
+		}
 	}
 	if	(getParameterByName('en1')) {
-		en1Opt = getParameterByName('en1');
+		if (getParameterByName('en1')!="0") {
+			en1Opt = getParameterByName('en1');
+		}
 	}
 	if	(getParameterByName('fs')) {
-		fsOpt = getParameterByName('fs');
+		if (getParameterByName('fs')!="0") {
+			fsOpt = getParameterByName('fs');
+		}
 	}
 	if	(getParameterByName('area')) {
-		areaOpt = getParameterByName('area');
+		if (getParameterByName('area')!="0") {
+			areaOpt = getParameterByName('area');
+		}
 	}
 	
 	
