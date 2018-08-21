@@ -49,6 +49,25 @@
 	  [mainOffsetX, mainHeight]
 	];
 	
+	var traceOpt = false;
+	var en1Opt = false;
+	var fsOpt = false;
+	var areaOpt = false;
+	
+	if	(getParameterByName('trace')) {
+		traceOpt = getParameterByName('trace');
+	}
+	if	(getParameterByName('en1')) {
+		en1Opt = getParameterByName('en1');
+	}
+	if	(getParameterByName('fs')) {
+		fsOpt = getParameterByName('fs');
+	}
+	if	(getParameterByName('area')) {
+		areaOpt = getParameterByName('area');
+	}
+	
+	
 	
 	//var gArr = [[20, 20],[380, 20],[380, 285],[261, 285],[261, 351],[380, 351],[380, 620],[20, 620]];
 	
@@ -642,7 +661,7 @@
 
         preload: function () {
         
-        	if (1==1) {
+        	if (!fsOpt) {
 				this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 				this.game.scale.pageAlignHorizontally = true;
 				this.game.scale.pageAlignVertically = true;
@@ -825,7 +844,9 @@
 			
 			traceOverlap: function () {
 				alert("Game over");
+				location.reload();
 				en1.destroy();
+				
 			},
 
         nextWeapon: function () {
@@ -925,19 +946,6 @@
         drawtraceArr: function () {
 			//draw out path from traceArr
 			if (traceArr.length>0) {
-				/*
-				ctx = gArea.context;
-				ctx.beginPath();
-				ctx.moveTo(traceArr[0][0],traceArr[0][1]);
-				for (var i = 0; i < traceArr.length; i++) {
-			
-					ctx.lineTo(traceArr[i][0],traceArr[i][1]);
-				}
-				ctx.lineTo(gPiece.x,gPiece.y);
-
-				ctx.lineWidth = 2;
-				ctx.strokeStyle = "blue";
-				ctx.stroke();*/
 				
 				
 				graphicsLine.lineStyle(2, 0xffd900, 1);
@@ -1006,9 +1014,7 @@
 				
 				
 				
-				//this.game.physics.arcade.overlap(this.traces, this.traces, this.traceOverlap, null, this);   
-				//this.game.physics.arcade.overlap(this.traces, this.player, this.traceOverlap, null, this);   
-				//this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
+				
            
 				this.player.anchor.set(0.5);
 
@@ -1096,165 +1102,222 @@
 					} 
 				}
 				if (updateDelay % (1) == 0) {
+				
+					if (this.mode != 0)
+					{
 				 
-					//if gMode is 1 and position not on wall advance in direction
-					//if gMode is 1 and position touched wall, change mode to 0
+						//if gMode is 1 and position not on wall advance in direction
+						//if gMode is 1 and position touched wall, change mode to 0
 					
-					var preX = this.player.x;
-					var preY = this.player.y;
+						var preX = this.player.x;
+						var preY = this.player.y;
+						var nextX = this.player.x;
+						var nextY = this.player.y;
 		
-					if (this.mode === "down") {
-						this.player.y += pSpd2;
-						this.drawtraceArr();
-					} else if (this.mode === "up") {
-						this.player.y -= pSpd2;
-						this.drawtraceArr();
-					} else if (this.mode === "left") {
-						this.player.x -= pSpd2;
-						this.drawtraceArr();
-					} else if (this.mode === "right") {
-						this.player.x += pSpd2;
-						this.drawtraceArr();
-					}
-					//check all paths, if touch wall, park on border line and change mode
-					if (!gPoly.contains(this.player.x, this.player.y)) {
-								
-						var intFlag = -1;
-						line1 = new Phaser.Line(preX, preY, this.player.x, this.player.y);
-						for (var i = 0; i < gArr.length; i++) {
+						if (this.mode === "down") {
+							nextY = this.player.y + pSpd2;
+							//this.player.y += pSpd2;
+							//this.drawtraceArr();
+						} else if (this.mode === "up") {
+							nextY = this.player.y - pSpd2;
+							//this.player.y -= pSpd2;
+							//this.drawtraceArr();
+						} else if (this.mode === "left") {
+							nextX = this.player.x - pSpd2;
+							//this.player.x -= pSpd2;
+							//this.drawtraceArr();
+						} else if (this.mode === "right") {
+							nextX = this.player.x + pSpd2;
+							//this.player.x += pSpd2;
+							//this.drawtraceArr();
+						}
 						
-							var pasti = i-1;
-							if (i-1<0) {
-								pasti=gArr.length-1;
+						var intFlag = -1;
+							
+						//check if player crosses any trace
+						if (traceArr.length>1) {
+							//console.log(Math.abs(traceArr[traceArr.length-1][0]-nextX) + ":::" + Math.abs(traceArr[traceArr.length-1][1]-nextY));
+							
+							var checkFlag = -1;
+							
+							if ((this.mode === "down")||(this.mode === "up")) {
+								if (Math.abs(traceArr[traceArr.length-1][1]-nextY)>10) {
+									checkFlag = 1;
+								}
+							} else if ((this.mode === "left")||(this.mode === "right")) {
+								if (Math.abs(traceArr[traceArr.length-1][0]-nextX)>10) {
+									checkFlag = 1;
+								}
 							}
 							
-							line2 = new Phaser.Line(gArr[pasti][0], gArr[pasti][1], gArr[i][0], gArr[i][1]);
+							if (checkFlag == 1) {
 							
-							p = line1.intersects(line2, true);
-
-							if (p) {
-								intFlag = i;
-								this.mode = 0;
-								this.player.x = p.x;
-								this.player.y = p.y;
-								
-								//enter final insertion position 
-								var posArr = [this.player.x,this.player.y];
-								traceArr.push(posArr);
-								
-								//divide into 2 polygons and check size
-								
-								//get origin insertion point 1 path
-								var tpath1 = getStep(traceArr[0][0],traceArr[0][1]);
-				
-								//get final insertion point 2 path
-								var tpath2 = getStep(traceArr[traceArr.length-1][0],traceArr[traceArr.length-1][1]);
-				
-								var path1;
-								var path2;
-								
-								//Set closer to path 0 point as first path
-								if (tpath2[0]>tpath1[0]) {
-									path1 = tpath1;
-									path2 = tpath2;
-					
-								} else if (tpath2[0]<tpath1[0]) {
-									path1 = tpath2;
-									path2 = tpath1;
-									traceArr = traceArr.reverse();
-					
-					
-								} else if (tpath2[0]==tpath1[0]) {
-									//check which came first
-					
-									path1 = tpath1;
-									path2 = tpath2;
-									//alert(path1[1]);
-					
-									//check path which is nearer to path point
-									if (path1[1]=="up") {
-										if (traceArr[0][1] < traceArr[traceArr.length-1][1]) {
-											traceArr = traceArr.reverse();
-										}
-									} else if (path1[1]=="down") {
-										if (traceArr[0][1] > traceArr[traceArr.length-1][1]) {
-											traceArr = traceArr.reverse();
-										}
-									} else if (path1[1]=="left") {
-										if (traceArr[0][0] < traceArr[traceArr.length-1][0]) {
-											traceArr = traceArr.reverse();
-										}
-									} else if (path1[1]=="right") {
-										//alert(traceArr[0][1] + ":::" + traceArr[traceArr.length-1][1]);
-										if (traceArr[0][0] > traceArr[traceArr.length-1][0]) {
-											traceArr = traceArr.reverse();
-										}
-									}
-								}
-								
-								//create now pathArrs
-								var newPathArr1 = [];
-								var newPathArr2 = [];
-				
-								//create path array 1
-								//Insert new paths starting from path 0
-								//what if path 1 = 0?
-								for (var i = 0; i < path1[0]; i++) {
-									newPathArr1.push (gArr[i]);
-								}
-								//insert traceArr path
-								for (var i = 0; i < traceArr.length; i++) {
-									newPathArr1.push (traceArr[i]);
-								}
-								//insert paths after insertion point 2
-								for (var i = path2[0]; i < gArr.length; i++) {
-									newPathArr1.push (gArr[i]);
-								}
-				
-								//create path array 2
-								traceArr = traceArr.reverse();
-				
-								for (var i = (path1[0]); i < (path2[0]); i++) {
-									newPathArr2.push (gArr[i]);
-								}
-								//insert traceArr path
-								for (var i = 0; i < traceArr.length; i++) {
-									newPathArr2.push (traceArr[i]);
-								}
-								
-								//console.log(newPathArr1);
-								//console.log(newPathArr2);
-								
-								var polyPoints = []
-			
-								for (var i = 0; i < newPathArr1.length; i++)
+								line1 = new Phaser.Line(preX, preY, nextX, nextY);
+								for (var i = 1; i < traceArr.length; i++)
 								{
-									polyPoints.push(newPathArr1[i][0]);
-									polyPoints.push(newPathArr1[i][1]);
-								}
-			
-								gPoly = new Phaser.Polygon(polyPoints);
-								
-								if (gPoly.contains(this.en1.x, this.en1.y)) {
-									gArr = [];
-									for (var i = 0; i <  newPathArr1.length; i++) {
-										gArr.push([newPathArr1[i][0],newPathArr1[i][1]]);
+									line2 = new Phaser.Line(traceArr[i-1][0], traceArr[i-1][1], traceArr[i][0], traceArr[i][1]);
+									p = line1.intersects(line2, true);
+
+									if (p) {
+										intFlag = i;
 									}
-								} else {
-									gArr = [];
-									for (var i = 0; i <  newPathArr2.length; i++) {
-										gArr.push([newPathArr2[i][0],newPathArr2[i][1]]);
-									}
+						
 								}
-								
-								traceArr = [];
-								this.drawtraceArr();
-								
-							} else {
-								
+							}
+						
+						}
+						
+						this.player.x = nextX;
+						this.player.y = nextY;
+						this.drawtraceArr();
+						
+						if (intFlag > -1) {
+							if (traceOpt) {
+								this.traceOverlap();
 							}
 						}
 						
+						
+						//check all paths, if touch wall, park on border line and change mode
+						if (!gPoly.contains(this.player.x, this.player.y)) {
+								
+							var intFlag = -1;
+							line1 = new Phaser.Line(preX, preY, this.player.x, this.player.y);
+							for (var i = 0; i < gArr.length; i++) {
+						
+								var pasti = i-1;
+								if (i-1<0) {
+									pasti=gArr.length-1;
+								}
+							
+								line2 = new Phaser.Line(gArr[pasti][0], gArr[pasti][1], gArr[i][0], gArr[i][1]);
+							
+								p = line1.intersects(line2, true);
+
+								if (p) {
+									intFlag = i;
+									this.mode = 0;
+									this.player.x = p.x;
+									this.player.y = p.y;
+								
+									//enter final insertion position 
+									var posArr = [this.player.x,this.player.y];
+									traceArr.push(posArr);
+								
+									//divide into 2 polygons and check size
+								
+									//get origin insertion point 1 path
+									var tpath1 = getStep(traceArr[0][0],traceArr[0][1]);
+				
+									//get final insertion point 2 path
+									var tpath2 = getStep(traceArr[traceArr.length-1][0],traceArr[traceArr.length-1][1]);
+				
+									var path1;
+									var path2;
+								
+									//Set closer to path 0 point as first path
+									if (tpath2[0]>tpath1[0]) {
+										path1 = tpath1;
+										path2 = tpath2;
+					
+									} else if (tpath2[0]<tpath1[0]) {
+										path1 = tpath2;
+										path2 = tpath1;
+										traceArr = traceArr.reverse();
+					
+					
+									} else if (tpath2[0]==tpath1[0]) {
+										//check which came first
+					
+										path1 = tpath1;
+										path2 = tpath2;
+										//alert(path1[1]);
+					
+										//check path which is nearer to path point
+										if (path1[1]=="up") {
+											if (traceArr[0][1] < traceArr[traceArr.length-1][1]) {
+												traceArr = traceArr.reverse();
+											}
+										} else if (path1[1]=="down") {
+											if (traceArr[0][1] > traceArr[traceArr.length-1][1]) {
+												traceArr = traceArr.reverse();
+											}
+										} else if (path1[1]=="left") {
+											if (traceArr[0][0] < traceArr[traceArr.length-1][0]) {
+												traceArr = traceArr.reverse();
+											}
+										} else if (path1[1]=="right") {
+											//alert(traceArr[0][1] + ":::" + traceArr[traceArr.length-1][1]);
+											if (traceArr[0][0] > traceArr[traceArr.length-1][0]) {
+												traceArr = traceArr.reverse();
+											}
+										}
+									}
+								
+									//create now pathArrs
+									var newPathArr1 = [];
+									var newPathArr2 = [];
+				
+									//create path array 1
+									//Insert new paths starting from path 0
+									//what if path 1 = 0?
+									for (var i = 0; i < path1[0]; i++) {
+										newPathArr1.push (gArr[i]);
+									}
+									//insert traceArr path
+									for (var i = 0; i < traceArr.length; i++) {
+										newPathArr1.push (traceArr[i]);
+									}
+									//insert paths after insertion point 2
+									for (var i = path2[0]; i < gArr.length; i++) {
+										newPathArr1.push (gArr[i]);
+									}
+				
+									//create path array 2
+									traceArr = traceArr.reverse();
+				
+									for (var i = (path1[0]); i < (path2[0]); i++) {
+										newPathArr2.push (gArr[i]);
+									}
+									//insert traceArr path
+									for (var i = 0; i < traceArr.length; i++) {
+										newPathArr2.push (traceArr[i]);
+									}
+								
+									//console.log(newPathArr1);
+									//console.log(newPathArr2);
+								
+									var polyPoints = []
+			
+									for (var i = 0; i < newPathArr1.length; i++)
+									{
+										polyPoints.push(newPathArr1[i][0]);
+										polyPoints.push(newPathArr1[i][1]);
+									}
+			
+									gPoly = new Phaser.Polygon(polyPoints);
+								
+									if (gPoly.contains(this.en1.x, this.en1.y)) {
+										gArr = [];
+										for (var i = 0; i <  newPathArr1.length; i++) {
+											gArr.push([newPathArr1[i][0],newPathArr1[i][1]]);
+										}
+									} else {
+										gArr = [];
+										for (var i = 0; i <  newPathArr2.length; i++) {
+											gArr.push([newPathArr2[i][0],newPathArr2[i][1]]);
+										}
+									}
+								
+									traceArr = [];
+									this.drawtraceArr();
+								
+								} else {
+								
+								}
+							}
+						
+						}
 					}
 				}
 				
@@ -1402,15 +1465,21 @@
 			this.en1.width = (en1Size * (gPoly.area/(mainWidth*mainHeight))) + (en1Size * 0.5);
 			this.en1.height = this.en1.width;
 			
-			/*if (gPoly.area/(mainWidth*mainHeight)<0.15) {
-				alert("WIN!");
-				n1.destroy();
-			}*/
+			if (areaOpt) {
+				if (gPoly.area/(mainWidth*mainHeight)<0.15) {
+					alert("WIN!");
+					location.reload();
+					en1.destroy();
+				}
+			}
 			
 			if (!gPoly.contains(this.en1.x, this.en1.y)) {
 				
 				this.en1.body.reset(this.en1.body.prev.x, this.en1.body.prev.y);
-				this.traceOverlap();
+				
+				if (traceOpt) {
+					this.traceOverlap();
+				}
 				
 			}
 			
@@ -1437,8 +1506,17 @@
             {
                 this.weapons[this.currentWeapon].fire(this.player);
             }
+            
+            //this.game.physics.arcade.overlap(this.traces, this.traces, this.traceOverlap, null, this);   
+			//this.game.physics.arcade.overlap(this.traces, this.player, this.traceOverlap, null, this);   
+			if (en1Opt) {
+				this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);  
+			}
+				
+				
             game.world.bringToTop(this.walls);
             game.world.bringToTop(this.traces);
+            game.world.bringToTop(this.en1);
 			game.world.bringToTop(this.player);
         }
 
@@ -1561,6 +1639,16 @@
 		var stepNowArr = [stepNow, dirNow];
 		return stepNowArr;
 	
+	}
+	
+	function getParameterByName(name, url) {
+		if (!url) url = window.location.href;
+		name = name.replace(/[\[\]]/g, '\\$&');
+		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	}
 
     </script>
