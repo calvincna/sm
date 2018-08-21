@@ -956,10 +956,7 @@
 
         update: function () {
 
-				updateDelay++;
-				
-				this.player.anchor.set(0.5);
-				this.en1.anchor.set(0.5);
+			updateDelay++;
 			
 			 
 				//this.physics.arcade.collide(this.wall1, this.en1);
@@ -1007,98 +1004,15 @@
 				
 				var collSize = 1;
 				
-				this.traces.removeAll(true);
 				
-				//create rectangle sprites for the trace
-				if (traceArr.length>1) {
-				
-				
-					for (var i = 1; i < traceArr.length; i++)
-					{
-						
-						//which position to use as start point?
-						var startX = traceArr[i][0];
-						var startY = traceArr[i][1];
-						//if horizontal path
-						if (traceArr[i][0] - traceArr[i-1][0]==0) {
-							if (traceArr[i][1]<traceArr[i-1][1]) {
-								//up
-								//startY = traceArr[i][1];
-							} else {
-								//down
-								startY = traceArr[i-1][1];
-							}
-						} else {
-						//vertical
-							if (traceArr[i][0]>traceArr[i-1][0]) {
-								//right
-								startX = traceArr[i-1][0];
-							} else {
-								//left
-								//startX = traceArr[i][0];
-							}
-						}
-					
-						var wall1 =  this.add.sprite(startX, startY, 'trace');
-						wall1.anchor.set(0.5);
-					
-					
-						wall1.width = Math.max(Math.abs(traceArr[i][0] - traceArr[i-1][0]),collSize);
-						wall1.height = Math.max(Math.abs(traceArr[i][1] - traceArr[i-1][1]),collSize);
-						this.physics.arcade.enable(wall1);
-						wall1.body.immovable = true;
-						//this.game.physics.arcade.overlap(wall1, this.traces, this.traceOverlap, null, this);   
-						//this.game.physics.arcade.overlap(wall1, this.player, this.traceOverlap, null, this); 
-						this.traces.add(wall1);
-					}
-				
-				}
-				
-				//mark final wall
-				if (traceArr.length>0) {
-					//which position to use as start point?
-					var dir1 = "up";
-					var startX = this.player.x;
-					var startY = this.player.y;
-					//if horizontal path
-					if (this.player.x - traceArr[traceArr.length-1][0]==0) {
-						if (this.player.y<traceArr[traceArr.length-1][1]) {
-							//up
-							//startY = traceArr[i][1];
-							
-						} else {
-							//down
-							dir1 = "down";
-							startY = traceArr[traceArr.length-1][1];
-						}
-					} else {
-					//vertical
-						if (this.player.x>traceArr[traceArr.length-1][0]) {
-							//right
-							dir1 = "right";
-							startX = traceArr[traceArr.length-1][0];
-						} else {
-							//left
-							dir1 = "left";
-							//startX = traceArr[i][0];
-						}
-					}
-				
-					var wall1 =  this.add.sprite(startX, startY, 'trace');
-					wall1.anchor.set(0.5);
-					wall1.width = Math.max(Math.abs(this.player.x - traceArr[traceArr.length-1][0]),collSize);
-					wall1.height = Math.max(Math.abs(this.player.y - traceArr[traceArr.length-1][1]),collSize);
-					
-					this.physics.arcade.enable(wall1);
-					wall1.body.immovable = true;
-					this.traces.add(wall1);
-				}
 				
 				//this.game.physics.arcade.overlap(this.traces, this.traces, this.traceOverlap, null, this);   
 				//this.game.physics.arcade.overlap(this.traces, this.player, this.traceOverlap, null, this);   
 				//this.game.physics.arcade.overlap(this.traces, this.en1, this.traceOverlap, null, this);   
            
-				
+				this.player.anchor.set(0.5);
+
+				this.en1.anchor.set(0.5);
 				this.en1.angle +=4;
 				
 				if (updateDelay % (55) == 0) {
@@ -1388,6 +1302,92 @@
 				}
 				
 				this.game.physics.arcade.collide(this.en1, this.walls);
+				
+				this.traces.removeAll(true);
+				
+				//create rectangle sprites for the trace
+				if (traceArr.length>1) {
+				
+				
+					for (var i = 1; i < traceArr.length; i++)
+					{
+						
+						//which position to use as start point?
+						var startX = traceArr[i][0];
+						var startY = traceArr[i][1];
+						//if horizontal path
+						if (traceArr[i][0] - traceArr[i-1][0]==0) {
+							if (traceArr[i][1]<traceArr[i-1][1]) {
+								//up
+								//startY = traceArr[i][1];
+							} else {
+								//down
+								startY = traceArr[i-1][1];
+							}
+						} else {
+						//vertical
+							if (traceArr[i][0]>traceArr[i-1][0]) {
+								//right
+								startX = traceArr[i-1][0];
+							} else {
+								//left
+								//startX = traceArr[i][0];
+							}
+						}
+					
+						var wall1 =  this.add.sprite(startX, startY, 'trace');
+					
+					
+						wall1.width = Math.max(Math.abs(traceArr[i][0] - traceArr[i-1][0]),collSize);
+						wall1.height = Math.max(Math.abs(traceArr[i][1] - traceArr[i-1][1]),collSize);
+						this.physics.arcade.enable(wall1);
+						wall1.body.immovable = true;
+						//this.game.physics.arcade.overlap(wall1, this.traces, this.traceOverlap, null, this);   
+						//this.game.physics.arcade.overlap(wall1, this.player, this.traceOverlap, null, this); 
+						this.traces.add(wall1);
+					}
+				
+				}
+				
+				//mark final wall
+				if (traceArr.length>0) {
+					//which position to use as start point?
+					var dir1 = "up";
+					var startX = this.player.x;
+					var startY = this.player.y;
+					//if horizontal path
+					if (this.player.x - traceArr[traceArr.length-1][0]==0) {
+						if (this.player.y<traceArr[traceArr.length-1][1]) {
+							//up
+							//startY = traceArr[i][1];
+							
+						} else {
+							//down
+							dir1 = "down";
+							startY = traceArr[traceArr.length-1][1];
+						}
+					} else {
+					//vertical
+						if (this.player.x>traceArr[traceArr.length-1][0]) {
+							//right
+							dir1 = "right";
+							startX = traceArr[traceArr.length-1][0];
+						} else {
+							//left
+							dir1 = "left";
+							//startX = traceArr[i][0];
+						}
+					}
+				
+					var wall1 =  this.add.sprite(startX, startY, 'trace');
+				
+					wall1.width = Math.max(Math.abs(this.player.x - traceArr[traceArr.length-1][0]),collSize);
+					wall1.height = Math.max(Math.abs(this.player.y - traceArr[traceArr.length-1][1]),collSize);
+					
+					this.physics.arcade.enable(wall1);
+					wall1.body.immovable = true;
+					this.traces.add(wall1);
+				}
 				
 				
 			var polyPoints = []
