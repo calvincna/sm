@@ -97,19 +97,19 @@ var Game = {
     preload : function() {
     
     	if (!fsOpt) {
-			game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-			game.scale.pageAlignHorizontally = true;
-			game.scale.pageAlignVertically = true;
+			this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+			this.game.scale.pageAlignHorizontally = true;
+			this.game.scale.pageAlignVertically = true;
 		}
         // Here we load all the needed resources for the level.
-        game.load.image('background', 'assets/images/back.png');
+        this.load.image('background', 'assets/images/back.png');
 		//this.load.image('foreground', 'assets/images/fore.png');
-		game.load.image('player', 'assets/images/cr.png');
-		game.load.spritesheet('en1', 'assets/images/en1.png');
+		this.load.image('player', 'assets/images/cr.png');
+		this.load.spritesheet('en1', 'assets/images/en1.png');
 		//this.load.bitmapFont('shmupfont', 'assets/images/shmupfont.png', 'assets/images/shmupfont.xml');
-		game.load.bitmapFont('carrier_command', 'assets/images/carrier_command.png', 'assets/images/carrier_command.xml');
-		game.load.image('wall', 'assets/images/bullet11.png');
-		game.load.image('trace', 'assets/images/bullet11.png');
+		this.load.bitmapFont('carrier_command', 'assets/images/carrier_command.png', 'assets/images/carrier_command.xml');
+		this.load.image('wall', 'assets/images/bullet11.png');
+		this.load.image('trace', 'assets/images/bullet11.png');
     },
 
     create : function() {
@@ -181,7 +181,7 @@ var Game = {
 					nextY = player.y - pSpd2;
 				} else if (mode === "left") {
 					nextX = player.x - pSpd2;
-				} else if (mode === "right") {
+				} else if (this.mode === "right") {
 					nextX = player.x + pSpd2;
 				}
 			
@@ -645,8 +645,6 @@ var Game = {
 			//this.player.rotation = this.math.angleBetween(this.player.x,this.player.y,mainWidth/2,mainHeight/2);
 		
 		} else {
-		
-		
 		
 			// saving mouse/finger coordinates
 			endswX = game.input.worldX;
