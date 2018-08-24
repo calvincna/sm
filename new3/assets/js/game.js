@@ -138,6 +138,9 @@ var Game = {
 
 		game.physics.arcade.enable(player);
 		game.physics.arcade.enable(en1);
+		
+		en1.width = en1Size * 1.5;
+		en1.height = en1.width;
 
 		// this.player.body.collideWorldBounds = true;
 		en1.body.collideWorldBounds = true;
@@ -907,6 +910,9 @@ var Game = {
 		
 		game.physics.arcade.enable(player);
 		game.physics.arcade.enable(en1);
+		
+		en1.width = en1Size * 1.5;
+		en1.height = en1.width;
 
 		// this.player.body.collideWorldBounds = true;
 		en1.body.collideWorldBounds = true;
