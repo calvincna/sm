@@ -2,9 +2,9 @@ var Menu = {
 
     preload : function() {
     	if (!fsOpt) {
-			this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-			this.game.scale.pageAlignHorizontally = true;
-			this.game.scale.pageAlignVertically = true;
+			game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+			game.scale.pageAlignHorizontally = true;
+			game.scale.pageAlignVertically = true;
 		}
         // Load all the needed resources for the menu.
         game.load.image('menu', './assets/images/menu.png');

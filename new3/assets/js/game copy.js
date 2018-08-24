@@ -160,7 +160,7 @@ var Game = {
     },
 
     update: function() {
-        //The update function is called constantly at a high rate (somewhere around 60fps)
+        // The update function is called constantly at a high rate (somewhere around 60fps)
         
         graphicsLine.clear();
 		graphics.clear();
@@ -344,9 +344,6 @@ var Game = {
 				if (!gPoly.contains(player.x, player.y)) {
 					
 					var intFlag = -1;
-					var intX = -1;
-					var intY = -1;
-					
 					line1 = new Phaser.Line(preX, preY, player.x, player.y);
 					for (var i = 0; i < gArr.length; i++) {
 			
@@ -361,173 +358,167 @@ var Game = {
 
 						if (p) {
 							intFlag = i;
-							intX = p.x;
-							intY = p.y;
-						} else {
+							mode = 0;
+							player.x = p.x;
+							player.y = p.y;
 					
-						}
-					}
+							//enter final insertion position 
+							var posArr = [player.x, player.y];
+							traceArr.push(posArr);
 					
-					//intersect found, process polygon
-					if (intFlag>-1) {
-						
-						mode = 0;
-						player.x = intX;
-						player.y = intY;
-				
-						//enter final insertion position 
-						var posArr = [player.x, player.y];
-						traceArr.push(posArr);
-				
-						//divide into 2 polygons and check size
-				
-						//get origin insertion point 1 path
-						var tpath1 = getStep(traceArr[0][0],traceArr[0][1]);
-
-						//get final insertion point 2 path
-						var tpath2 = getStep(traceArr[traceArr.length-1][0],traceArr[traceArr.length-1][1]);
-
-						var path1;
-						var path2;
-				
-						//Set closer to path 0 point as first path
-						if (tpath2[0]>tpath1[0]) {
-							path1 = tpath1;
-							path2 = tpath2;
+							//divide into 2 polygons and check size
+					
+							//get origin insertion point 1 path
+							var tpath1 = getStep(traceArr[0][0],traceArr[0][1]);
 	
-						} else if (tpath2[0]<tpath1[0]) {
-							path1 = tpath2;
-							path2 = tpath1;
+							//get final insertion point 2 path
+							var tpath2 = getStep(traceArr[traceArr.length-1][0],traceArr[traceArr.length-1][1]);
+	
+							var path1;
+							var path2;
+					
+							//Set closer to path 0 point as first path
+							if (tpath2[0]>tpath1[0]) {
+								path1 = tpath1;
+								path2 = tpath2;
+		
+							} else if (tpath2[0]<tpath1[0]) {
+								path1 = tpath2;
+								path2 = tpath1;
+								traceArr = traceArr.reverse();
+		
+		
+							} else if (tpath2[0]==tpath1[0]) {
+								//check which came first
+		
+								path1 = tpath1;
+								path2 = tpath2;
+								//alert(path1[1]);
+		
+								//check path which is nearer to path point
+								if (path1[1]=="up") {
+									if (traceArr[0][1] < traceArr[traceArr.length-1][1]) {
+										traceArr = traceArr.reverse();
+									}
+								} else if (path1[1]=="down") {
+									if (traceArr[0][1] > traceArr[traceArr.length-1][1]) {
+										traceArr = traceArr.reverse();
+									}
+								} else if (path1[1]=="left") {
+									if (traceArr[0][0] < traceArr[traceArr.length-1][0]) {
+										traceArr = traceArr.reverse();
+									}
+								} else if (path1[1]=="right") {
+									//alert(traceArr[0][1] + ":::" + traceArr[traceArr.length-1][1]);
+									if (traceArr[0][0] > traceArr[traceArr.length-1][0]) {
+										traceArr = traceArr.reverse();
+									}
+								}
+							}
+					
+							//create now pathArrs
+							var newPathArr1 = [];
+							var newPathArr2 = [];
+	
+							//create path array 1
+							//Insert new paths starting from path 0
+							//what if path 1 = 0?
+							for (var i = 0; i < path1[0]; i++) {
+								newPathArr1.push (gArr[i]);
+							}
+							//insert traceArr path
+							for (var i = 0; i < traceArr.length; i++) {
+								newPathArr1.push (traceArr[i]);
+							}
+							//insert paths after insertion point 2
+							for (var i = path2[0]; i < gArr.length; i++) {
+								newPathArr1.push (gArr[i]);
+							}
+	
+							//create path array 2
 							traceArr = traceArr.reverse();
 	
-	
-						} else if (tpath2[0]==tpath1[0]) {
-							//check which came first
-	
-							path1 = tpath1;
-							path2 = tpath2;
-							//alert(path1[1]);
-	
-							//check path which is nearer to path point
-							if (path1[1]=="up") {
-								if (traceArr[0][1] < traceArr[traceArr.length-1][1]) {
-									traceArr = traceArr.reverse();
+							for (var i = (path1[0]); i < (path2[0]); i++) {
+								newPathArr2.push (gArr[i]);
+							}
+							//insert traceArr path
+							for (var i = 0; i < traceArr.length; i++) {
+								newPathArr2.push (traceArr[i]);
+							}
+					
+							//console.log(newPathArr1);
+							//console.log(newPathArr2);
+					
+							var polyPoints = []
+
+							for (var i = 0; i < newPathArr1.length; i++)
+							{
+								polyPoints.push(newPathArr1[i][0]);
+								polyPoints.push(newPathArr1[i][1]);
+							}
+
+							var gPoly2 = new Phaser.Polygon(polyPoints);
+					
+							if (gPoly2.contains(en1.x, en1.y)) {
+								gArr = [];
+								for (var i = 0; i <  newPathArr1.length; i++) {
+									gArr.push([newPathArr1[i][0],newPathArr1[i][1]]);
 								}
-							} else if (path1[1]=="down") {
-								if (traceArr[0][1] > traceArr[traceArr.length-1][1]) {
-									traceArr = traceArr.reverse();
-								}
-							} else if (path1[1]=="left") {
-								if (traceArr[0][0] < traceArr[traceArr.length-1][0]) {
-									traceArr = traceArr.reverse();
-								}
-							} else if (path1[1]=="right") {
-								//alert(traceArr[0][1] + ":::" + traceArr[traceArr.length-1][1]);
-								if (traceArr[0][0] > traceArr[traceArr.length-1][0]) {
-									traceArr = traceArr.reverse();
+							} else {
+								gArr = [];
+								for (var i = 0; i <  newPathArr2.length; i++) {
+									gArr.push([newPathArr2[i][0],newPathArr2[i][1]]);
 								}
 							}
-						}
-				
-						//create now pathArrs
-						var newPathArr1 = [];
-						var newPathArr2 = [];
-
-						//create path array 1
-						//Insert new paths starting from path 0
-						//what if path 1 = 0?
-						for (var i = 0; i < path1[0]; i++) {
-							newPathArr1.push (gArr[i]);
-						}
-						//insert traceArr path
-						for (var i = 0; i < traceArr.length; i++) {
-							newPathArr1.push (traceArr[i]);
-						}
-						//insert paths after insertion point 2
-						for (var i = path2[0]; i < gArr.length; i++) {
-							newPathArr1.push (gArr[i]);
-						}
-
-						//create path array 2
-						traceArr = traceArr.reverse();
-
-						for (var i = (path1[0]); i < (path2[0]); i++) {
-							newPathArr2.push (gArr[i]);
-						}
-						//insert traceArr path
-						for (var i = 0; i < traceArr.length; i++) {
-							newPathArr2.push (traceArr[i]);
-						}
-				
-				
-						var polyPoints = []
-
-						for (var i = 0; i < newPathArr1.length; i++)
-						{
-							polyPoints.push(newPathArr1[i][0]);
-							polyPoints.push(newPathArr1[i][1]);
-						}
-
-						var gPoly2 = new Phaser.Polygon(polyPoints);
-				
-						if (gPoly2.contains(en1.x, en1.y)) {
-							gArr = [];
-							for (var i = 0; i <  newPathArr1.length; i++) {
-								gArr.push([newPathArr1[i][0],newPathArr1[i][1]]);
+							//recreate gPoly
+							var polyPoints = []
+		
+							for (var i = 0; i < gArr.length; i++)
+							{
+								polyPoints.push(gArr[i][0]);
+								polyPoints.push(gArr[i][1]);
 							}
-						} else {
-							gArr = [];
-							for (var i = 0; i <  newPathArr2.length; i++) {
-								gArr.push([newPathArr2[i][0],newPathArr2[i][1]]);
-							}
-						}
-						//recreate gPoly
-						var polyPoints = []
 	
-						for (var i = 0; i < gArr.length; i++)
-						{
-							polyPoints.push(gArr[i][0]);
-							polyPoints.push(gArr[i][1]);
-						}
-
-						gPoly = new Phaser.Polygon(polyPoints);
-						
-						//area check
-						en1.width = (en1Size * (gPoly.area/(mainWidth*mainHeight))) + (en1Size * 0.5);
-						en1.height = en1.width;
-
-						var areaP = (Math.round(gPoly.area/((mainWidth - mainOffsetX)*(mainHeight - mainOffsetY))*100));
-
-						areaTxt.text = areaP+"%";
-
-						//gameover if WIN
-						if (areaOpt) {
-							if (areaP<16) {
-								//alert("WIN!");
-								//this.state.start('Menu');
-								//game.state.start(game.state.current);
-								//location.reload();
-								//en1.destroy();
-								alert("WIN!");
-								this.traceOverlap();
+							gPoly = new Phaser.Polygon(polyPoints);
+							
+							//area check
+							en1.width = (en1Size * (gPoly.area/(mainWidth*mainHeight))) + (en1Size * 0.5);
+							en1.height = en1.width;
+	
+							var areaP = (Math.round(gPoly.area/((mainWidth - mainOffsetX)*(mainHeight - mainOffsetY))*100));
+	
+							areaTxt.text = areaP+"%";
+	
+							if (areaOpt) {
+								if (areaP<16) {
+									//alert("WIN!");
+									//this.state.start('Menu');
+									//game.state.start(game.state.current);
+									//location.reload();
+									//en1.destroy();
+									alert("WIN!");
+									this.traceOverlap();
+			
+								}
+							}
+	
+							if (!gPoly.contains(en1.x, en1.y)) {
+		
+								en1.body.reset(en1.body.prev.x, en1.body.prev.y);
+		
+								if (traceOpt) {
+									this.traceOverlap();
+								}
 		
 							}
+					
+							traceArr = [];
+							traces.removeAll(true);
+							//this.drawtraceArr();
+					
+						} else {
+					
 						}
-
-						if (!gPoly.contains(en1.x, en1.y)) {
-	
-							en1.body.reset(en1.body.prev.x, en1.body.prev.y);
-	
-							if (traceOpt) {
-								this.traceOverlap();
-							}
-	
-						}
-				
-						traceArr = [];
-						traces.removeAll(true);
-						//this.drawtraceArr();
-				
 					}
 			
 				}
